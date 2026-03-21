@@ -47,7 +47,7 @@ const FALLBACK_DATA = {
       genre: "Piseiro Pop",
       mood: "Romântico",
       price: 499,
-      audioUrl: "https://soundcloud.com/lahit/minha-flor", // substitua
+      audioUrl: "https://soundcloud.com/lahit/minha-flor",
     },
     {
       id: 2,
@@ -821,7 +821,7 @@ const Hero = () => {
 };
 
 // ============================================================
-// SMART CATALOG (com SoundCloud, sem login, grade original)
+// SMART CATALOG (com SoundCloud, cores ajustadas)
 // ============================================================
 const SmartCatalog = ({
   catalogo,
@@ -907,31 +907,31 @@ const SmartCatalog = ({
           </div>
         </div>
 
-        {/* GRADE ORIGINAL: 3 colunas */}
+        {/* GRADE COM CORES AJUSTADAS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredTracks.map((track: any) => (
             <div
               key={track.id}
-              className="group relative bg-slate-900/40 border border-white/5 hover:border-white/20 transition-all rounded-lg overflow-hidden"
+              className="group relative bg-slate-800/30 border border-white/10 hover:border-blue-500/40 transition-all rounded-xl overflow-hidden backdrop-blur-sm"
             >
-              <div className="p-4">
-                {/* Gênero */}
-                <div className="mb-2">
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest bg-slate-950 px-2 py-0.5 rounded">
+              <div className="p-5">
+                {/* Gênero com cor suave */}
+                <div className="mb-3">
+                  <span className="text-[9px] font-bold text-blue-300 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded-full">
                     {track.genre}
                   </span>
                 </div>
 
                 {/* Título e artista */}
-                <h3 className="text-lg font-black text-white group-hover:text-blue-400 transition-colors truncate tracking-tight mb-1">
+                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors truncate tracking-tight mb-1">
                   {track.title}
                 </h3>
-                <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">
+                <p className="text-xs text-slate-400 uppercase tracking-widest mb-4">
                   {track.artist}
                 </p>
 
                 {/* Player do SoundCloud */}
-                <div className="mb-3">
+                <div className="mb-4">
                   <iframe
                     width="100%"
                     height="166"
@@ -939,18 +939,18 @@ const SmartCatalog = ({
                     frameBorder="no"
                     allow="autoplay"
                     src={getSoundCloudEmbed(track.audioUrl)}
-                    className="rounded"
+                    className="rounded-lg shadow-md"
                   />
                 </div>
 
                 {/* Metadados e botão de licenciar */}
                 <div className="flex items-center justify-between">
-                  <div className="flex gap-3 text-[9px] font-mono text-slate-400">
-                    <span className="flex items-center gap-1">
-                      <Music size={10} /> {track.bpm} BPM
+                  <div className="flex gap-4 text-[10px] font-mono text-slate-400">
+                    <span className="flex items-center gap-1.5">
+                      <Music size={12} className="text-blue-400" /> {track.bpm} BPM
                     </span>
-                    <span className="flex items-center gap-1">
-                      <Layers size={10} /> {track.mood}
+                    <span className="flex items-center gap-1.5">
+                      <Layers size={12} className="text-blue-400" /> {track.mood}
                     </span>
                   </div>
                   <button
@@ -958,7 +958,7 @@ const SmartCatalog = ({
                       e.stopPropagation();
                       onLicenseClick(track);
                     }}
-                    className="text-[9px] bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded uppercase tracking-wider"
+                    className="text-[9px] bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1.5 rounded-full uppercase tracking-wider transition-all shadow-md hover:shadow-blue-500/30"
                   >
                     Licenciar
                   </button>
@@ -977,61 +977,6 @@ const SmartCatalog = ({
     </section>
   );
 };
-
-// ============================================================
-// BENTO STATS
-// ============================================================
-const BentoStats = () => (
-  <section className="py-20 bg-slate-900 px-6">
-    <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 grid-rows-2 gap-4 h-auto md:h-[500px]">
-      <div className="col-span-1 md:col-span-2 row-span-2 bg-gradient-to-br from-slate-800 to-slate-900 border border-white/10 rounded-3xl p-10 flex flex-col justify-between relative overflow-hidden group">
-        <div className="absolute top-0 right-0 p-32 bg-blue-600/10 blur-[100px] rounded-full" />
-        <ShieldCheck className="text-blue-500 w-12 h-12 mb-6" />
-        <div>
-          <h3 className="text-3xl font-bold text-white mb-2">
-            100% Royalty Free.
-          </h3>
-          <p className="text-slate-400">
-            Modelo flexível. Você dono do seu ativo.
-          </p>
-        </div>
-        <div className="mt-8 border-t border-white/5 pt-8 flex gap-8">
-          <div>
-            <span className="block text-2xl font-bold text-white">500+</span>
-            <span className="text-xs text-slate-500 uppercase tracking-widest">
-              Ativos
-            </span>
-          </div>
-          <div>
-            <span className="block text-2xl font-bold text-white">50M</span>
-            <span className="text-xs text-slate-500 uppercase tracking-widest">
-              Streams
-            </span>
-          </div>
-        </div>
-      </div>
-      <div className="col-span-1 md:col-span-2 bg-slate-800/40 border border-white/5 rounded-3xl p-8 flex items-center justify-between hover:border-blue-500/30 transition-colors">
-        <div>
-          <h4 className="text-xl font-bold text-white">Stems Profissionais.</h4>
-          <p className="text-sm text-slate-400 mt-1">
-            Multi-track wav files inclusos.
-          </p>
-        </div>
-        <Layers className="text-slate-600 w-8 h-8" />
-      </div>
-      <div className="col-span-1 bg-slate-800/40 border border-white/5 rounded-3xl p-8 flex flex-col justify-center items-center text-center">
-        <BarChart3 className="text-blue-500 w-10 h-10 mb-4" />
-        <h4 className="text-lg font-bold text-white">Data Driven</h4>
-      </div>
-      <div className="col-span-1 bg-blue-600 rounded-3xl p-8 flex flex-col justify-center items-center text-center relative overflow-hidden">
-        <Zap className="text-white w-10 h-10 mb-4 relative z-10" />
-        <h4 className="text-lg font-bold text-white relative z-10">
-          Entrega Rápida
-        </h4>
-      </div>
-    </div>
-  </section>
-);
 
 // ============================================================
 // SERVIÇOS
@@ -1491,7 +1436,7 @@ const Footer = () => {
 };
 
 // ============================================================
-// APP PRINCIPAL (sem login, sem TrendLab)
+// APP PRINCIPAL (sem BentoStats)
 // ============================================================
 export default function App() {
   const [config, setConfig] = useState<any>(null);
@@ -1608,14 +1553,12 @@ export default function App() {
       <Navbar links={config.links} />
       <main className="relative z-10">
         <Hero />
-        {/* TrendLab removido */}
         <SmartCatalog
           catalogo={config.catalogo}
           filteredTracks={filteredTracks}
           setFilteredTracks={setFilteredTracks}
           onLicenseClick={handleLicenseClick}
         />
-        <BentoStats />
         <Services servicos={config.servicos} links={config.links} onLeadOpen={handleLeadOpen} />
         <SocialProof cases={config.cases} />
       </main>
