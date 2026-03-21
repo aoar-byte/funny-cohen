@@ -821,14 +821,13 @@ const Hero = () => {
 };
 
 // ============================================================
-// COMPONENTE: SMART CATALOG (Design "List-View" Premium B2B)
+// COMPONENTE: SMART CATALOG (Com Scroll Interno e sem Download)
 // ============================================================
 const SmartCatalog = ({
   catalogo,
   filteredTracks,
   setFilteredTracks,
   onLicenseClick,
-  onDownloadClick, // Nova prop para a Tática 4 (Isca de Lead)
   currentTrack,
   setCurrentTrack,
   isPlaying,
@@ -865,12 +864,10 @@ const SmartCatalog = ({
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionHeader subtitle="Catálogo Oficial" title="A Biblioteca." />
 
-        {/* Barra de Pesquisa e Filtros (Top Bar) */}
+        {/* Top Bar (Busca e Filtros) */}
         <div className="flex flex-col lg:flex-row justify-between items-end mb-8 gap-6">
           <div className="w-full lg:w-1/3">
-            <div className="relative group">
-              <div className="absolute inset-0 bg-blue-600/10 blur-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative flex items-center bg-slate-900 border border-white/10 rounded-lg px-4 py-3 focus-within:border-blue-500 transition-colors shadow-inner">
+             <div className="relative flex items-center bg-slate-900 border border-white/10 rounded-lg px-4 py-3 focus-within:border-blue-500 transition-colors shadow-inner">
                 <Search size={18} className="text-slate-500 mr-3" />
                 <input
                   type="text"
@@ -879,13 +876,7 @@ const SmartCatalog = ({
                   placeholder="Pesquisar título, gênero, BPM..."
                   className="bg-transparent border-none text-sm text-white w-full focus:outline-none placeholder:text-slate-600 font-mono"
                 />
-                {searchTerm && (
-                  <button onClick={() => setSearchTerm("")} className="text-slate-500 hover:text-white">
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-            </div>
+             </div>
           </div>
 
           <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full lg:w-auto">
@@ -905,20 +896,20 @@ const SmartCatalog = ({
           </div>
         </div>
 
-        {/* Tabela "List-View" Profissional (Estilo Artlist) */}
-        <div className="bg-slate-900/50 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm">
-          {/* Cabeçalho da Tabela */}
-          <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 bg-slate-900/80 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-            <div className="col-span-1 text-center">Play</div>
-            <div className="col-span-4">Título da Faixa</div>
+        {/* TABELA COM SCROLL INTERNO (Max-Height 500px) */}
+        <div className="bg-slate-900/50 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm flex flex-col">
+          {/* Cabeçalho Fixo */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 bg-slate-900 text-[10px] font-bold text-slate-500 uppercase tracking-widest sticky top-0 z-20">
+            <div className="col-span-2 md:col-span-1 text-center">Play</div>
+            <div className="col-span-5 md:col-span-4">Título da Faixa</div>
             <div className="col-span-2 hidden md:block">Gênero</div>
             <div className="col-span-1 hidden md:block text-center">BPM</div>
             <div className="col-span-1 hidden md:block text-center">Mood</div>
-            <div className="col-span-3 text-right">Ações</div>
+            <div className="col-span-5 md:col-span-3 text-right">Ação</div>
           </div>
 
-          {/* Linhas das Músicas */}
-          <div className="flex flex-col">
+          {/* Área Rolável (O Catálogo em si) */}
+          <div className="flex flex-col overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
             {filteredTracks.map((track: any) => {
               const isCurrent = currentTrack?.id === track.id;
               
@@ -929,8 +920,7 @@ const SmartCatalog = ({
                     isCurrent ? "bg-blue-900/10" : "hover:bg-slate-800/50"
                   }`}
                 >
-                  {/* Botão de Play Nativo */}
-                  <div className="col-span-1 flex justify-center">
+                  <div className="col-span-2 md:col-span-1 flex justify-center">
                     <button
                       onClick={() => {
                         if (isCurrent) setIsPlaying(!isPlaying);
@@ -949,15 +939,13 @@ const SmartCatalog = ({
                     </button>
                   </div>
 
-                  {/* Info da Música */}
-                  <div className="col-span-7 md:col-span-4 flex flex-col justify-center">
+                  <div className="col-span-5 md:col-span-4 flex flex-col justify-center">
                     <h3 className={`text-sm font-bold truncate transition-colors ${isCurrent ? "text-blue-400" : "text-white group-hover:text-blue-300"}`}>
                       {track.title}
                     </h3>
                     <p className="text-[10px] text-slate-500 uppercase tracking-widest truncate">{track.artist}</p>
                   </div>
 
-                  {/* Metadados (Ocultos no Mobile) */}
                   <div className="col-span-2 hidden md:flex items-center">
                     <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded border border-white/5 truncate">
                       {track.genre}
@@ -970,17 +958,7 @@ const SmartCatalog = ({
                     <span className="text-[10px] text-slate-400 uppercase tracking-wider">{track.mood}</span>
                   </div>
 
-                  {/* Ações (Download Preview & Licenciar) */}
-                  <div className="col-span-4 md:col-span-3 flex items-center justify-end gap-2 md:gap-4">
-                    {/* TÁTICA 4: Isca de Lead (Download Icon) */}
-                    <button 
-                      onClick={() => onDownloadClick(track)}
-                      title="Baixar Preview MP3"
-                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-md transition-colors hidden sm:flex"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
-                    </button>
-
+                  <div className="col-span-5 md:col-span-3 flex items-center justify-end">
                     <button
                       onClick={() => onLicenseClick(track)}
                       className="text-[10px] font-bold uppercase tracking-widest bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white px-4 py-2 rounded transition-all whitespace-nowrap"
@@ -991,16 +969,138 @@ const SmartCatalog = ({
                 </div>
               );
             })}
-          </div>
 
-          {filteredTracks.length === 0 && (
-            <div className="text-center py-16">
-              <p className="text-slate-500 font-mono text-sm">ERRO 404: NENHUMA FAIXA ENCONTRADA</p>
-            </div>
-          )}
+            {filteredTracks.length === 0 && (
+              <div className="text-center py-16">
+                <p className="text-slate-500 font-mono text-sm">ERRO 404: NENHUMA FAIXA ENCONTRADA</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </section>
+  );
+};
+
+// ============================================================
+// COMPONENTE: PLAYER DE MÚSICA FIXO (TOCANDO ÁUDIO REAL)
+// ============================================================
+const PersistentPlayer = ({ track, isPlaying, setIsPlaying, onLicenseClick }: any) => {
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState("0:00");
+
+  // Formatador de tempo (0:00)
+  const formatTime = (time: number) => {
+    if (isNaN(time)) return "0:00";
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  };
+
+  // Motor Principal: Quando a música (track) ou o estado (isPlaying) muda.
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (isPlaying && track) {
+      audioRef.current.play().catch(e => console.error("Erro ao reproduzir áudio:", e));
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, track]);
+
+  // Atualiza a barra de progresso
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      const current = audioRef.current.currentTime;
+      const duration = audioRef.current.duration;
+      setCurrentTime(formatTime(current));
+      setProgress((current / duration) * 100);
+    }
+  };
+
+  // Se a música acabar, para o player
+  const handleEnded = () => {
+    setIsPlaying(false);
+    setProgress(0);
+    setCurrentTime("0:00");
+  };
+
+  return (
+    <AnimatePresence>
+      {track && (
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          exit={{ y: 100 }}
+          className="fixed bottom-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-t border-white/10 p-4 z-50 shadow-2xl"
+        >
+          {/* TAG DE ÁUDIO OCULTA (O motor que faz tocar) */}
+          <audio
+            ref={audioRef}
+            src={track.audioUrl} // AQUI ENTRA O LINK DO MP3 QUE ESTÁ NA SUA PLANILHA
+            onTimeUpdate={handleTimeUpdate}
+            onEnded={handleEnded}
+            preload="auto"
+          />
+
+          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            
+            {/* 1. Info da Música */}
+            <div className="flex items-center gap-4 w-1/4">
+              <div className="w-12 h-12 bg-slate-800 rounded-md relative flex items-center justify-center shrink-0 border border-white/5">
+                  <Music size={20} className="text-blue-500" />
+                  {isPlaying && (
+                    <div className="absolute inset-0 bg-blue-500/20 rounded-md animate-pulse" />
+                  )}
+              </div>
+              <div className="overflow-hidden">
+                <h4 className="text-white font-bold text-sm truncate">{track.title}</h4>
+                <p className="text-slate-500 text-xs truncate">{track.artist}</p>
+              </div>
+            </div>
+
+            {/* 2. Controles e Barra de Progresso */}
+            <div className="flex flex-col items-center w-2/4">
+              <div className="flex items-center gap-6 mb-2">
+                <button 
+                  onClick={() => setIsPlaying(!isPlaying)}
+                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-900 hover:scale-105 transition-transform shadow-lg"
+                >
+                  {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
+                </button>
+              </div>
+              
+              <div className="w-full flex items-center gap-3">
+                <span className="text-[10px] text-slate-500 font-mono w-8 text-right">{currentTime}</span>
+                <div className="h-1 bg-slate-800 rounded-full flex-1 overflow-hidden relative">
+                  {/* Barra que enche conforme a música toca */}
+                  <div 
+                    className="h-full bg-blue-500 absolute top-0 left-0 transition-all duration-100 ease-linear" 
+                    style={{ width: `${progress}%` }} 
+                  /> 
+                  <div className="absolute top-0 right-0 h-full w-full bg-[repeating-linear-gradient(90deg,transparent,transparent_2px,#ffffff05_4px)] pointer-events-none" />
+                </div>
+                <div className="flex items-center gap-1 text-[9px] font-bold text-slate-500 uppercase tracking-wider bg-slate-800/50 px-2 py-0.5 rounded border border-white/5 shrink-0">
+                  <ShieldCheck size={10} className="text-blue-500" />
+                  Preview
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Ação Final */}
+            <div className="w-1/4 flex justify-end">
+              <button
+                onClick={() => onLicenseClick(track)}
+                className="px-5 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 text-xs font-bold rounded hover:bg-blue-600 hover:text-white transition-all whitespace-nowrap shadow-[0_0_15px_-5px_rgba(59,130,246,0.3)]"
+              >
+                LICENCIAR FAIXA
+              </button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 // ============================================================
