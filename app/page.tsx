@@ -821,13 +821,18 @@ const Hero = () => {
 };
 
 // ============================================================
-// SMART CATALOG (com SoundCloud, cores ajustadas)
+// COMPONENTE: SMART CATALOG (Design "List-View" Premium B2B)
 // ============================================================
 const SmartCatalog = ({
   catalogo,
   filteredTracks,
   setFilteredTracks,
   onLicenseClick,
+  onDownloadClick, // Nova prop para a Tática 4 (Isca de Lead)
+  currentTrack,
+  setCurrentTrack,
+  isPlaying,
+  setIsPlaying,
 }: any) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("TODOS");
@@ -855,50 +860,43 @@ const SmartCatalog = ({
     setFilteredTracks(filtered);
   }, [searchTerm, activeFilter, catalogo, setFilteredTracks]);
 
-  const getSoundCloudEmbed = (url: string) => {
-    const encodedUrl = encodeURIComponent(url);
-    return `https://w.soundcloud.com/player/?url=${encodedUrl}&color=%23ff5500&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false&visual=false`;
-  };
-
   return (
-    <section
-      id="catalog"
-      className="py-32 bg-slate-950 border-t border-white/5 relative"
-    >
+    <section id="catalog" className="py-24 bg-slate-950 border-t border-white/5 relative">
       <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <SectionHeader subtitle="Inventory" title="O Cofre." />
+        <SectionHeader subtitle="Catálogo Oficial" title="A Biblioteca." />
 
-        <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
-          <div className="relative w-full max-w-lg">
-            <div className="flex items-center bg-slate-900 border-b border-white/20 hover:border-blue-500 transition-colors py-4">
-              <Search size={20} className="text-slate-500 mr-4" />
-              <input
-                type="text"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Buscar por título, artista, gênero, mood ou BPM..."
-                className="bg-transparent border-none text-sm text-white w-full focus:outline-none placeholder:text-slate-600 font-mono uppercase"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm("")}
-                  className="text-slate-400 hover:text-white mr-2"
-                >
-                  <X size={16} />
-                </button>
-              )}
+        {/* Barra de Pesquisa e Filtros (Top Bar) */}
+        <div className="flex flex-col lg:flex-row justify-between items-end mb-8 gap-6">
+          <div className="w-full lg:w-1/3">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-blue-600/10 blur-md rounded-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative flex items-center bg-slate-900 border border-white/10 rounded-lg px-4 py-3 focus-within:border-blue-500 transition-colors shadow-inner">
+                <Search size={18} className="text-slate-500 mr-3" />
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Pesquisar título, gênero, BPM..."
+                  className="bg-transparent border-none text-sm text-white w-full focus:outline-none placeholder:text-slate-600 font-mono"
+                />
+                {searchTerm && (
+                  <button onClick={() => setSearchTerm("")} className="text-slate-500 hover:text-white">
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full md:w-auto">
+          <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide w-full lg:w-auto">
             {filters.map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-6 py-3 text-[10px] font-bold uppercase tracking-widest border transition-all whitespace-nowrap ${
+                className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-md transition-all whitespace-nowrap ${
                   activeFilter === filter
-                    ? "bg-white text-slate-950 border-white"
-                    : "text-slate-400 border-white/5 hover:border-white/20 bg-slate-900"
+                    ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                    : "bg-slate-900 text-slate-400 border border-white/5 hover:bg-slate-800 hover:text-white"
                 }`}
               >
                 {filter}
@@ -907,77 +905,104 @@ const SmartCatalog = ({
           </div>
         </div>
 
-        {/* GRADE COM CORES AJUSTADAS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredTracks.map((track: any) => (
-            <div
-              key={track.id}
-              className="group relative bg-slate-800/30 border border-white/10 hover:border-blue-500/40 transition-all rounded-xl overflow-hidden backdrop-blur-sm"
-            >
-              <div className="p-5">
-                {/* Gênero com cor suave */}
-                <div className="mb-3">
-                  <span className="text-[9px] font-bold text-blue-300 uppercase tracking-widest bg-blue-500/10 px-2 py-0.5 rounded-full">
-                    {track.genre}
-                  </span>
-                </div>
+        {/* Tabela "List-View" Profissional (Estilo Artlist) */}
+        <div className="bg-slate-900/50 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm">
+          {/* Cabeçalho da Tabela */}
+          <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 bg-slate-900/80 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+            <div className="col-span-1 text-center">Play</div>
+            <div className="col-span-4">Título da Faixa</div>
+            <div className="col-span-2 hidden md:block">Gênero</div>
+            <div className="col-span-1 hidden md:block text-center">BPM</div>
+            <div className="col-span-1 hidden md:block text-center">Mood</div>
+            <div className="col-span-3 text-right">Ações</div>
+          </div>
 
-                {/* Título e artista */}
-                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors truncate tracking-tight mb-1">
-                  {track.title}
-                </h3>
-                <p className="text-xs text-slate-400 uppercase tracking-widest mb-4">
-                  {track.artist}
-                </p>
+          {/* Linhas das Músicas */}
+          <div className="flex flex-col">
+            {filteredTracks.map((track: any) => {
+              const isCurrent = currentTrack?.id === track.id;
+              
+              return (
+                <div
+                  key={track.id}
+                  className={`grid grid-cols-12 gap-4 px-6 py-4 items-center border-b border-white/5 transition-colors group ${
+                    isCurrent ? "bg-blue-900/10" : "hover:bg-slate-800/50"
+                  }`}
+                >
+                  {/* Botão de Play Nativo */}
+                  <div className="col-span-1 flex justify-center">
+                    <button
+                      onClick={() => {
+                        if (isCurrent) setIsPlaying(!isPlaying);
+                        else {
+                          setCurrentTrack(track);
+                          setIsPlaying(true);
+                        }
+                      }}
+                      className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                        isCurrent && isPlaying
+                          ? "bg-blue-500 text-white shadow-[0_0_15px_-3px_rgba(59,130,246,0.6)]"
+                          : "bg-slate-800 text-slate-400 group-hover:bg-white group-hover:text-slate-900"
+                      }`}
+                    >
+                      {isCurrent && isPlaying ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-1" />}
+                    </button>
+                  </div>
 
-                {/* Player do SoundCloud */}
-                <div className="mb-4">
-                  <iframe
-                    width="100%"
-                    height="166"
-                    scrolling="no"
-                    frameBorder="no"
-                    allow="autoplay"
-                    src={getSoundCloudEmbed(track.audioUrl)}
-                    className="rounded-lg shadow-md"
-                  />
-                </div>
+                  {/* Info da Música */}
+                  <div className="col-span-7 md:col-span-4 flex flex-col justify-center">
+                    <h3 className={`text-sm font-bold truncate transition-colors ${isCurrent ? "text-blue-400" : "text-white group-hover:text-blue-300"}`}>
+                      {track.title}
+                    </h3>
+                    <p className="text-[10px] text-slate-500 uppercase tracking-widest truncate">{track.artist}</p>
+                  </div>
 
-                {/* Metadados e botão de licenciar */}
-                <div className="flex items-center justify-between">
-                  <div className="flex gap-4 text-[10px] font-mono text-slate-400">
-                    <span className="flex items-center gap-1.5">
-                      <Music size={12} className="text-blue-400" /> {track.bpm} BPM
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Layers size={12} className="text-blue-400" /> {track.mood}
+                  {/* Metadados (Ocultos no Mobile) */}
+                  <div className="col-span-2 hidden md:flex items-center">
+                    <span className="text-xs text-slate-300 bg-slate-800 px-2 py-1 rounded border border-white/5 truncate">
+                      {track.genre}
                     </span>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onLicenseClick(track);
-                    }}
-                    className="text-[9px] bg-blue-600/80 hover:bg-blue-600 text-white px-3 py-1.5 rounded-full uppercase tracking-wider transition-all shadow-md hover:shadow-blue-500/30"
-                  >
-                    Licenciar
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                  <div className="col-span-1 hidden md:flex justify-center items-center">
+                    <span className="text-xs font-mono text-slate-400">{track.bpm}</span>
+                  </div>
+                  <div className="col-span-1 hidden md:flex justify-center items-center">
+                    <span className="text-[10px] text-slate-400 uppercase tracking-wider">{track.mood}</span>
+                  </div>
 
-        {filteredTracks.length === 0 && (
-          <div className="text-center py-12 text-slate-400">
-            Nenhuma faixa encontrada para sua busca.
+                  {/* Ações (Download Preview & Licenciar) */}
+                  <div className="col-span-4 md:col-span-3 flex items-center justify-end gap-2 md:gap-4">
+                    {/* TÁTICA 4: Isca de Lead (Download Icon) */}
+                    <button 
+                      onClick={() => onDownloadClick(track)}
+                      title="Baixar Preview MP3"
+                      className="p-2 text-slate-400 hover:text-white hover:bg-slate-700 rounded-md transition-colors hidden sm:flex"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                    </button>
+
+                    <button
+                      onClick={() => onLicenseClick(track)}
+                      className="text-[10px] font-bold uppercase tracking-widest bg-blue-600/10 border border-blue-500/30 text-blue-400 hover:bg-blue-600 hover:text-white px-4 py-2 rounded transition-all whitespace-nowrap"
+                    >
+                      Licenciar
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        )}
+
+          {filteredTracks.length === 0 && (
+            <div className="text-center py-16">
+              <p className="text-slate-500 font-mono text-sm">ERRO 404: NENHUMA FAIXA ENCONTRADA</p>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
 };
-
 // ============================================================
 // SERVIÇOS
 // ============================================================
