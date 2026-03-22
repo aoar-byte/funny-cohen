@@ -290,7 +290,7 @@ function addTimestamp(url: string) {
 }
 
 // ============================================================
-// MAPEAMENTO DE ÍCONES (para converter string → componente)
+// MAPEAMENTO DE ÍCONES
 // ============================================================
 const iconMap: Record<string, React.ElementType> = {
   PenTool,
@@ -308,7 +308,7 @@ function getIconComponent(iconName: string): React.ElementType {
 }
 
 // ============================================================
-// FUNÇÃO PARA BUSCAR E PARSEAR CSV (com timestamp e fallback)
+// FUNÇÃO PARA BUSCAR E PARSEAR CSV
 // ============================================================
 async function fetchSheet<T>(url: string): Promise<T[]> {
   try {
@@ -663,7 +663,7 @@ const Navbar = ({ links }: { links: any }) => {
             Cases
           </button>
         </div>
-        <div className="w-24" /> {/* espaçador */}
+        <div className="w-24" />
       </div>
     </nav>
   );
@@ -833,7 +833,7 @@ const Hero = () => {
 };
 
 // ============================================================
-// COMPONENTE: SMART CATALOG (Com Scroll Interno)
+// COMPONENTE: SMART CATALOG
 // ============================================================
 const SmartCatalog = ({
   catalogo,
@@ -876,7 +876,6 @@ const SmartCatalog = ({
       <div className="max-w-7xl mx-auto px-6 relative z-10">
         <SectionHeader subtitle="Catálogo Oficial" title="A Biblioteca." />
 
-        {/* Top Bar (Busca e Filtros) */}
         <div className="flex flex-col lg:flex-row justify-between items-end mb-8 gap-6">
           <div className="w-full lg:w-1/3">
              <div className="relative flex items-center bg-slate-900 border border-white/10 rounded-lg px-4 py-3 focus-within:border-blue-500 transition-colors shadow-inner">
@@ -908,9 +907,7 @@ const SmartCatalog = ({
           </div>
         </div>
 
-        {/* TABELA COM SCROLL INTERNO */}
         <div className="bg-slate-900/50 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm flex flex-col">
-          {/* Cabeçalho Fixo */}
           <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 bg-slate-900 text-[10px] font-bold text-slate-500 uppercase tracking-widest sticky top-0 z-20">
             <div className="col-span-2 md:col-span-1 text-center">Play</div>
             <div className="col-span-5 md:col-span-4">Título da Faixa</div>
@@ -920,7 +917,6 @@ const SmartCatalog = ({
             <div className="col-span-5 md:col-span-3 text-right">Ação</div>
           </div>
 
-          {/* Área Rolável */}
           <div className="flex flex-col overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-slate-900">
             {filteredTracks.map((track: any) => {
               const isCurrent = currentTrack?.id === track.id;
@@ -935,8 +931,9 @@ const SmartCatalog = ({
                   <div className="col-span-2 md:col-span-1 flex justify-center">
                     <button
                       onClick={() => {
-                        if (isCurrent) setIsPlaying(!isPlaying);
-                        else {
+                        if (isCurrent) {
+                          setIsPlaying(!isPlaying);
+                        } else {
                           setCurrentTrack(track);
                           setIsPlaying(true);
                         }
@@ -995,13 +992,14 @@ const SmartCatalog = ({
 };
 
 // ============================================================
-// PLAYER DE MÚSICA FIXO (TOCANDO ÁUDIO REAL)
+// PLAYER DE MÚSICA FIXO (CORRIGIDO)
 // ============================================================
 const PersistentPlayer = ({ track, isPlaying, setIsPlaying, onLicenseClick }: any) => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState("0:00");
   const [duration, setDuration] = useState("0:00");
+  const [audioLoaded, setAudioLoaded] = useState(false);
 
   const formatTime = (time: number) => {
     if (isNaN(time)) return "0:00";
@@ -1010,37 +1008,48 @@ const PersistentPlayer = ({ track, isPlaying, setIsPlaying, onLicenseClick }: an
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // Quando a música ou estado de play muda
+  // Reset quando a track muda
   useEffect(() => {
-    if (!audioRef.current) return;
-
-    if (isPlaying && track?.audioUrl) {
-      audioRef.current.play().catch(e => console.error("Erro ao reproduzir áudio:", e));
-    } else {
+    if (audioRef.current) {
       audioRef.current.pause();
-    }
-  }, [isPlaying, track]);
-
-  // Quando a track muda, resetar
-  useEffect(() => {
-    if (audioRef.current && track) {
       audioRef.current.load();
       setProgress(0);
       setCurrentTime("0:00");
+      setDuration("0:00");
+      setAudioLoaded(false);
+      
+      // Se a nova track deve tocar automaticamente
+      if (isPlaying && track) {
+        setTimeout(() => {
+          audioRef.current?.play().catch(e => console.error("Erro ao reproduzir:", e));
+        }, 100);
+      }
     }
   }, [track]);
+
+  // Controla play/pause
+  useEffect(() => {
+    if (!audioRef.current || !audioLoaded) return;
+    
+    if (isPlaying) {
+      audioRef.current.play().catch(e => console.error("Erro ao reproduzir:", e));
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlaying, audioLoaded]);
+
+  const handleLoadedMetadata = () => {
+    if (audioRef.current) {
+      setDuration(formatTime(audioRef.current.duration));
+      setAudioLoaded(true);
+    }
+  };
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
       const current = audioRef.current.currentTime;
       setCurrentTime(formatTime(current));
       setProgress((current / audioRef.current.duration) * 100);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(formatTime(audioRef.current.duration));
     }
   };
 
@@ -1051,80 +1060,81 @@ const PersistentPlayer = ({ track, isPlaying, setIsPlaying, onLicenseClick }: an
   };
 
   const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (audioRef.current) {
+    if (audioRef.current && audioLoaded) {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left;
-      const percentage = x / rect.width;
+      const percentage = Math.min(Math.max(x / rect.width, 0), 1);
       audioRef.current.currentTime = percentage * audioRef.current.duration;
     }
   };
 
+  if (!track) return null;
+
   return (
     <AnimatePresence>
-      {track && (
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          exit={{ y: 100 }}
-          className="fixed bottom-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-t border-white/10 p-4 z-50 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]"
-        >
-          <audio
-            ref={audioRef}
-            src={track.audioUrl}
-            onTimeUpdate={handleTimeUpdate}
-            onEnded={handleEnded}
-            onLoadedMetadata={handleLoadedMetadata}
-            preload="auto"
-          />
+      <motion.div
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        exit={{ y: 100 }}
+        className="fixed bottom-0 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-t border-white/10 p-4 z-50 shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.5)]"
+      >
+        <audio
+          ref={audioRef}
+          src={track.audioUrl}
+          onTimeUpdate={handleTimeUpdate}
+          onEnded={handleEnded}
+          onLoadedMetadata={handleLoadedMetadata}
+          preload="auto"
+        />
 
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
-            <div className="flex items-center gap-4 w-full md:w-1/4">
-              <div className="w-12 h-12 bg-slate-800 rounded-md relative flex items-center justify-center shrink-0 border border-white/5">
-                  <Music size={20} className="text-blue-500" />
-                  {isPlaying && <div className="absolute inset-0 bg-blue-500/20 rounded-md animate-pulse" />}
-              </div>
-              <div className="overflow-hidden">
-                <h4 className="text-white font-bold text-sm truncate">{track.title}</h4>
-                <p className="text-slate-500 text-xs truncate">{track.artist}</p>
-              </div>
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap md:flex-nowrap">
+          <div className="flex items-center gap-4 w-full md:w-1/4">
+            <div className="w-12 h-12 bg-slate-800 rounded-md relative flex items-center justify-center shrink-0 border border-white/5">
+              <Music size={20} className="text-blue-500" />
+              {isPlaying && <div className="absolute inset-0 bg-blue-500/20 rounded-md animate-pulse" />}
             </div>
-
-            <div className="flex flex-col items-center w-full md:w-2/4">
-              <div className="flex items-center gap-6 mb-2">
-                <button 
-                  onClick={() => setIsPlaying(!isPlaying)}
-                  className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-900 hover:scale-105 transition-transform shadow-lg"
-                >
-                  {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
-                </button>
-              </div>
-              
-              <div className="w-full flex items-center gap-3">
-                <span className="text-[10px] text-slate-500 font-mono w-8 text-right">{currentTime}</span>
-                <div 
-                  onClick={handleSeek}
-                  className="h-1 bg-slate-800 rounded-full flex-1 overflow-hidden relative cursor-pointer"
-                >
-                  <div 
-                    className="h-full bg-blue-500 absolute top-0 left-0 transition-all duration-100 ease-linear" 
-                    style={{ width: `${progress}%` }} 
-                  />
-                </div>
-                <span className="text-[10px] text-slate-500 font-mono w-8">{duration}</span>
-              </div>
-            </div>
-
-            <div className="w-full md:w-1/4 flex justify-end">
-              <button
-                onClick={() => onLicenseClick(track)}
-                className="px-5 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 text-xs font-bold rounded hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-              >
-                LICENCIAR FAIXA
-              </button>
+            <div className="overflow-hidden">
+              <h4 className="text-white font-bold text-sm truncate">{track.title}</h4>
+              <p className="text-slate-500 text-xs truncate">{track.artist}</p>
             </div>
           </div>
-        </motion.div>
-      )}
+
+          <div className="flex flex-col items-center w-full md:w-2/4">
+            <div className="flex items-center gap-6 mb-2">
+              <button 
+                onClick={() => setIsPlaying(!isPlaying)}
+                className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-slate-900 hover:scale-105 transition-transform shadow-lg"
+                disabled={!audioLoaded}
+              >
+                {isPlaying ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" className="ml-1" />}
+              </button>
+            </div>
+            
+            <div className="w-full flex items-center gap-3">
+              <span className="text-[10px] text-slate-500 font-mono w-8 text-right">{currentTime}</span>
+              <div 
+                onClick={handleSeek}
+                className={`h-1 bg-slate-800 rounded-full flex-1 overflow-hidden relative ${audioLoaded ? 'cursor-pointer' : 'cursor-default'}`}
+              >
+                <div 
+                  className="h-full bg-blue-500 absolute top-0 left-0 transition-all duration-100 ease-linear" 
+                  style={{ width: `${progress}%` }} 
+                />
+              </div>
+              <span className="text-[10px] text-slate-500 font-mono w-8">{duration}</span>
+            </div>
+          </div>
+
+          <div className="w-full md:w-1/4 flex justify-end">
+            <button
+              onClick={() => onLicenseClick(track)}
+              className="px-5 py-2 bg-blue-600/10 text-blue-400 border border-blue-500/20 text-xs font-bold rounded hover:bg-blue-600 hover:text-white transition-all shadow-sm whitespace-nowrap"
+            >
+              LICENCIAR FAIXA
+            </button>
+          </div>
+        </div>
+      </motion.div>
     </AnimatePresence>
   );
 };
@@ -1456,12 +1466,28 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
 };
 
 // ============================================================
-// SEÇÃO DE PROVA SOCIAL (CASES)
+// SEÇÃO DE PROVA SOCIAL (CASES - CORRIGIDA)
 // ============================================================
 const SocialProof = ({ cases }: { cases: any[] }) => {
-  // Função para tratar erro de imagem
+  // Função para corrigir o caminho da imagem
+  const getImageUrl = (path: string) => {
+    if (!path) return "https://picsum.photos/id/100/400/300";
+    
+    // Se já é uma URL completa, retorna ela
+    if (path.startsWith("http")) return path;
+    
+    // Remove /public do início se existir
+    let cleanPath = path.replace(/^\/public/, "");
+    
+    // Garante que comece com /
+    if (!cleanPath.startsWith("/")) cleanPath = "/" + cleanPath;
+    
+    return cleanPath;
+  };
+
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    e.currentTarget.src = "https://picsum.photos/id/100/400/300"; // Imagem fallback
+    console.error("Erro ao carregar imagem:", e.currentTarget.src);
+    e.currentTarget.src = "https://picsum.photos/id/100/400/300";
   };
 
   return (
@@ -1470,49 +1496,46 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
         <SectionHeader subtitle="Resultados" title="Músicas em Ação." />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {cases.map((item) => (
-            <a
-              key={item.id}
-              href={item.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group block bg-slate-900/50 border border-white/5 hover:border-blue-500/30 transition-all overflow-hidden"
-            >
-              <div className="aspect-video bg-slate-800 relative overflow-hidden">
-                {item.videoThumb || item.image ? (
+          {cases.map((item) => {
+            const imageSrc = getImageUrl(item.videoThumb || item.image);
+            return (
+              <a
+                key={item.id}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group block bg-slate-900/50 border border-white/5 hover:border-blue-500/30 transition-all overflow-hidden"
+              >
+                <div className="aspect-video bg-slate-800 relative overflow-hidden">
                   <img
-                    src={item.videoThumb || item.image}
+                    src={imageSrc}
                     alt={item.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     onError={handleImageError}
                   />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center bg-slate-800">
-                    <ImageIcon size={24} className="text-slate-600" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
+                  <div className="absolute bottom-2 left-2 flex items-center gap-1 text-[10px] text-white bg-black/60 px-2 py-1 rounded-full">
+                    <span>{item.platform}</span>
+                    <ExternalLink size={10} />
                   </div>
-                )}
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
-                <div className="absolute bottom-2 left-2 flex items-center gap-1 text-[10px] text-white bg-black/60 px-2 py-1 rounded-full">
-                  <span>{item.platform}</span>
-                  <ExternalLink size={10} />
                 </div>
-              </div>
-              <div className="p-4">
-                <h4 className="text-white font-bold text-sm mb-1 truncate">
-                  {item.title}
-                </h4>
-                <p className="text-slate-400 text-xs mb-2">{item.artist}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-emerald-500 text-xs font-bold">
-                    {item.plays} plays
-                  </span>
-                  <span className="text-blue-500 text-xs group-hover:underline">
-                    Ver mais
-                  </span>
+                <div className="p-4">
+                  <h4 className="text-white font-bold text-sm mb-1 truncate">
+                    {item.title}
+                  </h4>
+                  <p className="text-slate-400 text-xs mb-2">{item.artist}</p>
+                  <div className="flex items-center justify-between">
+                    <span className="text-emerald-500 text-xs font-bold">
+                      {item.plays} plays
+                    </span>
+                    <span className="text-blue-500 text-xs group-hover:underline">
+                      Ver mais
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </a>
-          ))}
+              </a>
+            );
+          })}
         </div>
 
         <p className="text-center text-slate-500 text-xs mt-12">
@@ -1632,8 +1655,8 @@ export default function App() {
             genre: item.genre || "Outro",
             mood: item.mood || "Neutro",
             price: Number(item.price) || 0,
-            audioUrl: item.audioUrl || item.link || "", // Aceita tanto audioUrl quanto link
-          }));
+            audioUrl: item.audioUrl || item.link || "", // Aceita audioUrl ou link
+          })).filter((track: any) => track.audioUrl); // Remove tracks sem áudio
         }
 
         // Processa cases
@@ -1643,8 +1666,8 @@ export default function App() {
             id: Number(item.id) || 0,
             title: item.title || "Case",
             artist: item.artist || "L'A HIT Originals",
-            image: item.image || item.videoThumb || "",
-            videoThumb: item.videoThumb || item.image || "",
+            image: item.image || "",
+            videoThumb: item.videoThumb || "",
             link: item.link || "#",
             plays: item.plays || "0",
             platform: item.platform || "Streaming",
