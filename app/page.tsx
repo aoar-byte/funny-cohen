@@ -828,10 +828,10 @@ const SmartCatalog = ({
   filteredTracks,
   setFilteredTracks,
   onLicenseClick,
-  currentTrack,
-  setCurrentTrack,
-  isPlaying,
-  setIsPlaying,
+  currentTrack,       // <-- ADICIONADO
+  setCurrentTrack,    // <-- ADICIONADO
+  isPlaying,          // <-- ADICIONADO
+  setIsPlaying,       // <-- ADICIONADO
 }: any) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeFilter, setActiveFilter] = useState("TODOS");
