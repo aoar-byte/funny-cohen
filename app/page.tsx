@@ -1479,23 +1479,15 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
     return cleanPath;
   };
 
-  // FUNÇÃO QUE CONVERTE O VALOR DA PLANILHA EM POSIÇÃO CSS
   const getObjectPosition = (enquadramento: string) => {
     switch(enquadramento) {
-      case "face":
-        return "center 20%";      // Mostra o rosto
-      case "top":
-        return "center 0%";       // Mostra o topo
-      case "body":
-        return "center 40%";      // Mostra corpo inteiro
-      case "bottom":
-        return "center 100%";     // Mostra a base
-      case "left":
-        return "0% center";       // Mostra lado esquerdo
-      case "right":
-        return "100% center";     // Mostra lado direito
-      default:
-        return "center center";   // Centralizado padrão
+      case "face": return "center 20%";
+      case "top": return "center 0%";
+      case "body": return "center 40%";
+      case "bottom": return "center 100%";
+      case "left": return "0% center";
+      case "right": return "100% center";
+      default: return "center center";
     }
   };
 
@@ -1541,18 +1533,16 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
                 rel="noopener noreferrer"
                 className="group block bg-slate-900/50 border border-white/5 hover:border-blue-500/30 transition-all overflow-hidden"
               >
-                {/* CONTAINER DA IMAGEM */}
                 <div className="relative w-full bg-slate-800 overflow-hidden" style={{ aspectRatio: "16/9" }}>
                   {imageSrc && !hasError ? (
                     <img
                       src={imageSrc}
                       alt={item.title}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      style={{ objectPosition }} // ← AQUI APLICA O ENQUADRAMENTO
+                      style={{ objectPosition }}
                       onError={() => handleImageError(item.id)}
                     />
                   ) : (
-                    /* PLACEHOLDER */
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900">
                       <div className="text-center">
                         <div className="w-12 h-12 bg-slate-700/50 rounded-full flex items-center justify-center mx-auto mb-2">
@@ -1568,10 +1558,8 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
                     </div>
                   )}
                   
-                  {/* GRADIENTE INFERIOR */}
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60 pointer-events-none" />
                   
-                  {/* BADGE DA PLATAFORMA */}
                   <div className="absolute bottom-2 left-2 flex items-center gap-1 text-[10px] text-white bg-black/60 backdrop-blur-sm px-2 py-1 rounded-full z-10">
                     {item.platform === "YouTube" && <Youtube size={10} className="text-red-500" />}
                     {item.platform === "Spotify" && <Music size={10} className="text-green-500" />}
@@ -1581,7 +1569,6 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
                   </div>
                 </div>
                 
-                {/* CONTEÚDO TEXTUAL */}
                 <div className="p-4">
                   <h4 className="text-white font-bold text-sm mb-1 line-clamp-1 group-hover:text-blue-400 transition-colors">
                     {item.title}
@@ -1736,20 +1723,21 @@ export default function App() {
           })).filter((track: any) => track.audioUrl); // Remove tracks sem áudio
         }
 
-        // Processa cases
-        let cases = FALLBACK_DATA.cases;
-        if (casesRaw.length > 0) {
-          cases = casesRaw.map((item: any) => ({
-            id: Number(item.id) || 0,
-            title: item.title || "Case",
-            artist: item.artist || "L'A HIT Originals",
-            image: item.image || "",
-            videoThumb: item.videoThumb || "",
-            link: item.link || "#",
-            plays: item.plays || "0",
-            platform: item.platform || "Streaming",
-          }));
-        }
+       // Processa cases
+let cases = FALLBACK_DATA.cases;
+if (casesRaw.length > 0) {
+  cases = casesRaw.map((item: any) => ({
+    id: Number(item.id) || 0,
+    title: item.title || "Case",
+    artist: item.artist || "L'A HIT Originals",
+    image: item.image || "",
+    videoThumb: item.videoThumb || "",
+    link: item.link || "#",
+    plays: item.plays || "0",
+    platform: item.platform || "Streaming",
+    enquadramento: item.enquadramento || "center",
+  }));
+}
 
         // Processa serviços
         let servicos = FALLBACK_DATA.servicos;
