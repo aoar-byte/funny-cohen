@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS (VERSÃO PROFISSIONAL)
+// SERVIÇOS (LADO A LADO: EMPRESAS | ARTISTAS)
 // ============================================================
 const Services = ({ servicos, links, onLeadOpen }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1224,80 +1224,208 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     return desc.split("|").map(part => part.trim()).filter(part => part);
   };
 
+  // Separa os serviços por categoria
+  const servicosEmpresas = servicos.filter((s: any) => 
+    s.id === "sync" || s.id === "brand"
+  );
+  
+  const servicosArtistas = servicos.filter((s: any) => 
+    s.id === "ghost" || s.id === "distro" || s.id === "marketing"
+  );
+
   return (
     <section
       id="services"
       className="py-32 bg-slate-900 border-t border-white/5"
     >
       <div className="max-w-7xl mx-auto px-6">
-        <SectionHeader subtitle="Solutions" title="Para Empresas." />
+        
+        {/* TÍTULO PRINCIPAL */}
+        <div className="mb-16 text-center">
+          <div className="flex items-center justify-center gap-2 text-blue-500 font-mono text-xs tracking-widest uppercase mb-3">
+            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+            Solutions
+            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+          </div>
+          <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">
+            Soluções Integradas
+          </h2>
+          <p className="text-slate-400 text-sm mt-3 max-w-2xl mx-auto">
+            Atendemos tanto o mercado corporativo quanto artistas independentes.
+          </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-          {servicos.map((s: any, i: number) => {
-            const Icon = s.icon;
-            const descLines = formatDescription(s.desc);
-            
-            return (
-              <div
-                key={i}
-                className={`w-full group p-6 bg-slate-950 border transition-all duration-500 flex flex-col items-start justify-between relative overflow-hidden ${
-                  s.highlight
-                    ? "border-blue-500/30 shadow-lg shadow-blue-500/10 hover:border-blue-400/50"
-                    : "border-white/5 hover:border-blue-500/30"
-                }`}
-              >
-                {s.highlight && (
-                  <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-[8px] font-bold px-2 py-1 rounded-full shadow-lg">
-                    DESTAQUE
-                  </div>
-                )}
+        {/* DIVISÃO LADO A LADO */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
+          {/* COLUNA ESQUERDA - EMPRESAS */}
+          <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-6">
+            <div className="mb-8">
+              <div className="flex items-center gap-2 text-blue-500 font-mono text-xs tracking-widest uppercase mb-3">
+                <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+                B2B Solutions
+              </div>
+              <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                Para Empresas.
+              </h3>
+              <p className="text-slate-400 text-sm mt-2">
+                Licenciamento e identidade sonora para marcas, agências e produtoras.
+              </p>
+            </div>
 
-                <Icon
-                  className={`w-10 h-10 mb-4 transition-transform group-hover:scale-110 ${
-                    s.highlight ? "text-blue-500" : "text-blue-500"
-                  }`}
-                />
-
-                <h3 className={`text-lg font-bold mb-3 ${
-                  s.highlight ? "text-blue-400" : "text-white"
-                }`}>
-                  {s.title}
-                </h3>
+            <div className="space-y-6">
+              {servicosEmpresas.map((s: any, i: number) => {
+                const Icon = s.icon;
+                const descLines = formatDescription(s.desc);
                 
-                <div className="mb-4 flex-1 space-y-2">
-                  {descLines.map((line, idx) => (
-                    <p key={idx} className="text-slate-400 text-xs leading-relaxed">
-                      {line}
-                    </p>
-                  ))}
-                </div>
+                return (
+                  <div
+                    key={i}
+                    className="group p-6 bg-slate-900/50 border border-white/5 hover:border-blue-500/30 rounded-xl transition-all duration-500"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 bg-blue-500/10 rounded-lg flex items-center justify-center shrink-0">
+                        <Icon className="w-5 h-5 text-blue-500" />
+                      </div>
+                      <div className="flex-1">
+                        <h4 className="text-lg font-bold text-white mb-3">
+                          {s.title}
+                        </h4>
+                        <div className="space-y-2 mb-4">
+                          {descLines.map((line, idx) => (
+                            <p key={idx} className="text-slate-400 text-xs leading-relaxed">
+                              {line}
+                            </p>
+                          ))}
+                        </div>
+                        <div className="text-[10px] text-emerald-500 font-mono mb-4">
+                          *Sob consulta*
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => openDetails(s)}
+                            className="flex-1 py-2 border border-white/20 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-white/5 transition-colors rounded"
+                          >
+                            {s.cta || "CONSULTAR"}
+                          </button>
+                          <button
+                            onClick={() => window.open(links.whatsapp, "_blank")}
+                            className="py-2 px-3 bg-green-600 hover:bg-green-700 text-white transition-colors rounded"
+                            title="Falar no WhatsApp"
+                          >
+                            <MessageCircle size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
 
-                <div className="text-[10px] text-emerald-500 font-mono mb-4">
-                  {s.highlight ? "*Sob consulta*" : "*Sob consulta*"}
-                </div>
+          {/* COLUNA DIREITA - ARTISTAS */}
+          <div className="bg-slate-950/50 border border-white/5 rounded-2xl p-6">
+            <div className="mb-8">
+              <div className="flex items-center gap-2 text-emerald-500 font-mono text-xs tracking-widest uppercase mb-3">
+                <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                Artist Solutions
+              </div>
+              <h3 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                Para Artistas.
+              </h3>
+              <p className="text-slate-400 text-sm mt-2">
+                Soluções completas para sua carreira musical, do estúdio ao streaming.
+              </p>
+            </div>
 
-                <div className="flex gap-3 w-full mt-auto">
-                  <button
-                    onClick={() => openDetails(s)}
-                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all ${
-                      s.highlight
-                        ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/20"
-                        : "border border-white/20 text-white hover:bg-white/5"
+            <div className="space-y-6">
+              {servicosArtistas.map((s: any, i: number) => {
+                const Icon = s.icon;
+                const descLines = formatDescription(s.desc);
+                const isDistro = s.id === "distro";
+                
+                return (
+                  <div
+                    key={i}
+                    className={`group p-6 bg-slate-900/50 border rounded-xl transition-all duration-500 ${
+                      isDistro
+                        ? "border-emerald-500/30 hover:border-emerald-500/50"
+                        : "border-white/5 hover:border-blue-500/30"
                     }`}
                   >
-                    {s.cta || "CONSULTAR"}
-                  </button>
-                  <button
-                    onClick={() => window.open(links.whatsapp, "_blank")}
-                    className="py-3 px-4 bg-green-600 hover:bg-green-700 text-white transition-colors rounded"
-                    title="Falar no WhatsApp"
-                  >
-                    <MessageCircle size={14} />
-                  </button>
-                </div>
-              </div>
-            );
-          })}
+                    <div className="flex items-start gap-4">
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                        isDistro ? "bg-emerald-500/10" : "bg-blue-500/10"
+                      }`}>
+                        <Icon className={`w-5 h-5 ${
+                          isDistro ? "text-emerald-500" : "text-blue-500"
+                        }`} />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className={`text-lg font-bold ${
+                            isDistro ? "text-emerald-400" : "text-white"
+                          }`}>
+                            {s.title}
+                          </h4>
+                          {isDistro && (
+                            <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full border border-emerald-500/30">
+                              PARCEIRO
+                            </span>
+                          )}
+                        </div>
+                        <div className="space-y-2 mb-4">
+                          {descLines.map((line, idx) => (
+                            <p key={idx} className="text-slate-400 text-xs leading-relaxed">
+                              {line}
+                            </p>
+                          ))}
+                        </div>
+
+                        {/* Logo do parceiro - apenas no card de Distribuição */}
+                        {isDistro && (
+                          <div className="mb-4 flex justify-start">
+                            <img 
+                              src="/parceiro-logo.png" 
+                              alt="Parceiro"
+                              className="h-6 opacity-60 hover:opacity-100 transition-opacity"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        )}
+
+                        <div className="text-[10px] text-emerald-500 font-mono mb-4">
+                          *Sob consulta*
+                        </div>
+                        <div className="flex gap-3">
+                          <button
+                            onClick={() => openDetails(s)}
+                            className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors rounded ${
+                              isDistro
+                                ? "bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-600/30"
+                                : "border border-white/20 text-white hover:bg-white/5"
+                            }`}
+                          >
+                            {s.cta || "CONSULTAR"}
+                          </button>
+                          <button
+                            onClick={() => window.open(links.whatsapp, "_blank")}
+                            className="py-2 px-3 bg-green-600 hover:bg-green-700 text-white transition-colors rounded"
+                            title="Falar no WhatsApp"
+                          >
+                            <MessageCircle size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1308,7 +1436,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
             <motion.div
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="bg-slate-900 border border-white/10 w-full max-w-lg p-8 relative max-h-[80vh] overflow-y-auto"
+              className="bg-slate-900 border border-white/10 w-full max-w-lg p-8 relative max-h-[80vh] overflow-y-auto rounded-2xl"
             >
               <button
                 onClick={() => setModalOpen(false)}
@@ -1337,6 +1465,20 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                   ))}
                 </div>
               </div>
+
+              {selectedService.id === "distro" && (
+                <div className="mb-6 p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                  <p className="text-emerald-400 text-xs font-mono mb-2">🚀 EM PARCERIA COM</p>
+                  <img 
+                    src="/parceiro-logo.png" 
+                    alt="Parceiro"
+                    className="h-8 opacity-80"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
 
               <div className="mb-6 p-4 bg-slate-800/50 border border-white/5 rounded-lg">
                 <p className="text-emerald-500 text-xs font-mono mb-2">*Sob consulta*</p>
