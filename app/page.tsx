@@ -1140,7 +1140,7 @@ const PersistentPlayer = ({ track, isPlaying, setIsPlaying, onLicenseClick }: an
 };
 
 // ============================================================
-// SERVIÇOS (VERSÃO CORRIGIDA)
+// SERVIÇOS (VERSÃO CORRIGIDA - CADA | VIRA NOVA LINHA)
 // ============================================================
 const Services = ({ servicos, links, onLeadOpen }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1151,10 +1151,10 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     setModalOpen(true);
   };
 
-  // Função para limpar e formatar a descrição
+  // Função para formatar a descrição - cada | vira uma nova linha
   const formatDescription = (desc: string) => {
-    if (!desc) return "";
-    // Substitui | por quebras de linha
+    if (!desc) return [];
+    // Divide pelo | e remove espaços extras
     return desc.split("|").map(part => part.trim()).filter(part => part);
   };
 
@@ -1195,22 +1195,13 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
 
                 <h3 className="text-xl font-bold text-white mb-3">{s.title}</h3>
                 
-                {/* Descrição formatada com lista */}
-                <div className="mb-4 flex-1">
-                  {descLines.length > 1 ? (
-                    <ul className="space-y-2">
-                      {descLines.map((line, idx) => (
-                        <li key={idx} className="text-slate-400 text-xs leading-relaxed flex items-start gap-2">
-                          <span className="text-blue-500 mt-0.5">•</span>
-                          <span>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p className="text-slate-400 text-xs leading-relaxed">
-                      {s.desc}
+                {/* Descrição formatada - CADA | VIRA UMA NOVA LINHA */}
+                <div className="mb-4 flex-1 space-y-2">
+                  {descLines.map((line, idx) => (
+                    <p key={idx} className="text-slate-400 text-xs leading-relaxed">
+                      {line}
                     </p>
-                  )}
+                  ))}
                 </div>
 
                 <div className="text-[10px] text-emerald-500 font-mono mb-4">
