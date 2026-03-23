@@ -1466,7 +1466,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
 };
 
 // ============================================================
-// SEÇÃO DE PROVA SOCIAL (CASES - ENQUADRAMENTO CORRIGIDO)
+// SEÇÃO DE PROVA SOCIAL (CASES - COM CONTROLE POR PLANILHA)
 // ============================================================
 const SocialProof = ({ cases }: { cases: any[] }) => {
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -1477,6 +1477,51 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
     let cleanPath = path.replace(/^\/public/, "");
     if (!cleanPath.startsWith("/")) cleanPath = "/" + cleanPath;
     return cleanPath;
+  };
+
+  // FUNÇÃO QUE MAPEIA O VALOR DA PLANILHA PARA objectPosition
+  const getObjectPosition = (enquadramento: string) => {
+    const positions: Record<string, string> = {
+      // Para rostos e close-ups
+      "face": "center 20%",
+      "rosto": "center 20%",
+      "close": "center 20%",
+      
+      // Centralizado padrão
+      "center": "center center",
+      "centro": "center center",
+      "default": "center center",
+      
+      // Foco no topo
+      "top": "center 0%",
+      "topo": "center 0%",
+      "cabeca": "center 0%",
+      
+      // Foco na base
+      "bottom": "center 100%",
+      "base": "center 100%",
+      "pe": "center 100%",
+      
+      // Corpo inteiro
+      "body": "center 40%",
+      "corpo": "center 40%",
+      "full": "center 40%",
+      
+      // Lateral esquerda
+      "left": "0% center",
+      "esquerda": "0% center",
+      
+      // Lateral direita
+      "right": "100% center",
+      "direita": "100% center",
+    };
+    
+    // Se tiver valor personalizado, usa ele (ex: "70% 30%")
+    if (enquadramento && enquadramento.includes("%")) {
+      return enquadramento;
+    }
+    
+    return positions[enquadramento?.toLowerCase()] || "center center";
   };
 
   const handleImageError = (id: string | number) => {
@@ -1501,6 +1546,9 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
             const playsValue = formatPlays(item.plays);
             const hasError = imageErrors[item.id];
             
+            // LÊ O VALOR DA PLANILHA
+            const objectPosition = getObjectPosition(item.enquadramento || item.foco || "center");
+            
             return (
               <a
                 key={item.id}
@@ -1509,18 +1557,16 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
                 rel="noopener noreferrer"
                 className="group block bg-slate-900/50 border border-white/5 hover:border-blue-500/30 transition-all overflow-hidden"
               >
-                {/* CONTAINER DA IMAGEM COM ASPECT RATIO 16:9 */}
+                {/* CONTAINER DA IMAGEM */}
                 <div className="relative w-full bg-slate-800 overflow-hidden" style={{ aspectRatio: "16/9" }}>
-                  
-                  {/* OPÇÃO 1: OBJECT-POSITION MANUAL - MELHOR PARA ROSTOS */}
                   {imageSrc && !hasError ? (
                     <img
                       src={imageSrc}
                       alt={item.title}
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                       style={{
-                        // CENTRALIZA VERTICALMENTE NO TOPO (mostra mais o rosto)
-                        objectPosition: "center 20%",
+                        // APLICA O POSICIONAMENTO DEFINIDO NA PLANILHA
+                        objectPosition: objectPosition,
                       }}
                       onError={() => handleImageError(item.id)}
                     />
@@ -1595,7 +1641,6 @@ const SocialProof = ({ cases }: { cases: any[] }) => {
     </section>
   );
 };
-
 // ============================================================
 // RODAPÉ
 // ============================================================
