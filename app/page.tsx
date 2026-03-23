@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS (VERSÃO COM DESTAQUE PARA DISTRIBUIÇÃO)
+// SERVIÇOS (VERSÃO PROFISSIONAL)
 // ============================================================
 const Services = ({ servicos, links, onLeadOpen }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1219,7 +1219,6 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     setModalOpen(true);
   };
 
-  // Função para formatar a descrição - cada | vira uma nova linha
   const formatDescription = (desc: string) => {
     if (!desc) return [];
     return desc.split("|").map(part => part.trim()).filter(part => part);
@@ -1233,53 +1232,38 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
       <div className="max-w-7xl mx-auto px-6">
         <SectionHeader subtitle="Solutions" title="Para Empresas." />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           {servicos.map((s: any, i: number) => {
             const Icon = s.icon;
             const descLines = formatDescription(s.desc);
-            const isDistro = s.id === "distro" || s.title?.toLowerCase().includes("distribui");
             
             return (
               <div
                 key={i}
                 className={`w-full group p-6 bg-slate-950 border transition-all duration-500 flex flex-col items-start justify-between relative overflow-hidden ${
-                  isDistro 
-                    ? "border-blue-500/30 shadow-lg shadow-blue-500/10 hover:border-blue-400/50" 
-                    : s.highlight
-                      ? "border-yellow-500/50 shadow-lg shadow-yellow-500/10 hover:border-yellow-400/50"
-                      : "border-white/5 hover:border-blue-500/30"
+                  s.highlight
+                    ? "border-blue-500/30 shadow-lg shadow-blue-500/10 hover:border-blue-400/50"
+                    : "border-white/5 hover:border-blue-500/30"
                 }`}
               >
-                {/* Badge especial para distribuição */}
-                {isDistro && (
+                {s.highlight && (
                   <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-[8px] font-bold px-2 py-1 rounded-full shadow-lg">
-                    🚀 PARA ARTISTAS
-                  </div>
-                )}
-                
-                {s.highlight && !isDistro && (
-                  <div className="absolute top-3 right-3 bg-yellow-500 text-black text-[8px] font-bold px-2 py-1 rounded-full">
-                    MAIS POPULAR
+                    DESTAQUE
                   </div>
                 )}
 
                 <Icon
                   className={`w-10 h-10 mb-4 transition-transform group-hover:scale-110 ${
-                    isDistro 
-                      ? "text-blue-500" 
-                      : s.highlight 
-                        ? "text-yellow-500" 
-                        : "text-blue-500"
+                    s.highlight ? "text-blue-500" : "text-blue-500"
                   }`}
                 />
 
-                <h3 className={`text-xl font-bold mb-3 ${
-                  isDistro ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400" : "text-white"
+                <h3 className={`text-lg font-bold mb-3 ${
+                  s.highlight ? "text-blue-400" : "text-white"
                 }`}>
                   {s.title}
                 </h3>
                 
-                {/* Descrição formatada */}
                 <div className="mb-4 flex-1 space-y-2">
                   {descLines.map((line, idx) => (
                     <p key={idx} className="text-slate-400 text-xs leading-relaxed">
@@ -1288,49 +1272,28 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                   ))}
                 </div>
 
-                {/* Chamada especial para distribuição */}
-                {isDistro && (
-                  <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg w-full">
-                    <p className="text-[10px] text-blue-400 font-mono uppercase tracking-wider mb-1">
-                      🎯 SOLUÇÃO COMPLETA PARA ARTISTAS
-                    </p>
-                    <p className="text-[10px] text-slate-400 leading-relaxed">
-                      + Suporte personalizado • + Análise de métricas • + Consultoria estratégica
-                    </p>
-                  </div>
-                )}
-
                 <div className="text-[10px] text-emerald-500 font-mono mb-4">
-                  *Sob consulta*
+                  {s.highlight ? "*Sob consulta*" : "*Sob consulta*"}
                 </div>
 
                 <div className="flex gap-3 w-full mt-auto">
-                  {isDistro ? (
-                    <a
-                      href={s.external || links.whatsapp}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold uppercase tracking-widest text-center hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/20"
-                    >
-                      {s.cta || "CONHECER PARCEIRO"} →
-                    </a>
-                  ) : (
-                    <>
-                      <button
-                        onClick={() => openDetails(s)}
-                        className="flex-1 py-3 border border-white/20 text-white text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors"
-                      >
-                        {s.cta || "CONSULTAR"}
-                      </button>
-                      <button
-                        onClick={() => window.open(links.whatsapp, "_blank")}
-                        className="py-3 px-4 bg-green-600 hover:bg-green-700 text-white transition-colors"
-                        title="Falar no WhatsApp"
-                      >
-                        <MessageCircle size={14} />
-                      </button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => openDetails(s)}
+                    className={`flex-1 py-3 text-xs font-bold uppercase tracking-widest transition-all ${
+                      s.highlight
+                        ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 shadow-lg shadow-blue-500/20"
+                        : "border border-white/20 text-white hover:bg-white/5"
+                    }`}
+                  >
+                    {s.cta || "CONSULTAR"}
+                  </button>
+                  <button
+                    onClick={() => window.open(links.whatsapp, "_blank")}
+                    className="py-3 px-4 bg-green-600 hover:bg-green-700 text-white transition-colors rounded"
+                    title="Falar no WhatsApp"
+                  >
+                    <MessageCircle size={14} />
+                  </button>
                 </div>
               </div>
             );
@@ -1385,7 +1348,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
               <div className="flex gap-3">
                 <button
                   onClick={() => window.open(links.whatsapp, "_blank")}
-                  className="w-full py-3 bg-green-600 text-white font-bold uppercase tracking-widest hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full py-3 bg-green-600 text-white font-bold uppercase tracking-widest hover:bg-green-700 transition-colors flex items-center justify-center gap-2 rounded"
                 >
                   <MessageCircle size={18} />
                   FALAR NO WHATSAPP
