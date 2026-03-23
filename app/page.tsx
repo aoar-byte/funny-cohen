@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS (VERSÃO CORRIGIDA - CADA | VIRA NOVA LINHA)
+// SERVIÇOS (VERSÃO COM DESTAQUE PARA DISTRIBUIÇÃO)
 // ============================================================
 const Services = ({ servicos, links, onLeadOpen }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1222,7 +1222,6 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
   // Função para formatar a descrição - cada | vira uma nova linha
   const formatDescription = (desc: string) => {
     if (!desc) return [];
-    // Divide pelo | e remove espaços extras
     return desc.split("|").map(part => part.trim()).filter(part => part);
   };
 
@@ -1243,27 +1242,44 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
             return (
               <div
                 key={i}
-                className={`w-full group p-6 bg-slate-950 border ${
-                  s.highlight
-                    ? "border-yellow-500/50 shadow-lg shadow-yellow-500/10"
-                    : "border-white/5"
-                } hover:border-blue-500/30 transition-all duration-500 flex flex-col items-start justify-between relative overflow-hidden min-h-[480px]`}
+                className={`w-full group p-6 bg-slate-950 border transition-all duration-500 flex flex-col items-start justify-between relative overflow-hidden ${
+                  isDistro 
+                    ? "border-blue-500/30 shadow-lg shadow-blue-500/10 hover:border-blue-400/50" 
+                    : s.highlight
+                      ? "border-yellow-500/50 shadow-lg shadow-yellow-500/10 hover:border-yellow-400/50"
+                      : "border-white/5 hover:border-blue-500/30"
+                }`}
               >
-                {s.highlight && (
+                {/* Badge especial para distribuição */}
+                {isDistro && (
+                  <div className="absolute top-3 right-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-[8px] font-bold px-2 py-1 rounded-full shadow-lg">
+                    🚀 PARA ARTISTAS
+                  </div>
+                )}
+                
+                {s.highlight && !isDistro && (
                   <div className="absolute top-3 right-3 bg-yellow-500 text-black text-[8px] font-bold px-2 py-1 rounded-full">
                     MAIS POPULAR
                   </div>
                 )}
 
                 <Icon
-                  className={`w-10 h-10 ${
-                    s.highlight ? "text-yellow-500" : "text-blue-500"
-                  } group-hover:scale-110 transition-transform mb-4`}
+                  className={`w-10 h-10 mb-4 transition-transform group-hover:scale-110 ${
+                    isDistro 
+                      ? "text-blue-500" 
+                      : s.highlight 
+                        ? "text-yellow-500" 
+                        : "text-blue-500"
+                  }`}
                 />
 
-                <h3 className="text-xl font-bold text-white mb-3">{s.title}</h3>
+                <h3 className={`text-xl font-bold mb-3 ${
+                  isDistro ? "text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400" : "text-white"
+                }`}>
+                  {s.title}
+                </h3>
                 
-                {/* Descrição formatada - CADA | VIRA UMA NOVA LINHA */}
+                {/* Descrição formatada */}
                 <div className="mb-4 flex-1 space-y-2">
                   {descLines.map((line, idx) => (
                     <p key={idx} className="text-slate-400 text-xs leading-relaxed">
@@ -1271,6 +1287,18 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                     </p>
                   ))}
                 </div>
+
+                {/* Chamada especial para distribuição */}
+                {isDistro && (
+                  <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg w-full">
+                    <p className="text-[10px] text-blue-400 font-mono uppercase tracking-wider mb-1">
+                      🎯 SOLUÇÃO COMPLETA PARA ARTISTAS
+                    </p>
+                    <p className="text-[10px] text-slate-400 leading-relaxed">
+                      + Suporte personalizado • + Análise de métricas • + Consultoria estratégica
+                    </p>
+                  </div>
+                )}
 
                 <div className="text-[10px] text-emerald-500 font-mono mb-4">
                   *Sob consulta*
@@ -1282,9 +1310,9 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                       href={s.external || links.whatsapp}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 py-3 bg-blue-600 text-white text-xs font-bold uppercase tracking-widest text-center hover:bg-blue-700 transition-colors"
+                      className="flex-1 py-3 bg-gradient-to-r from-blue-600 to-blue-500 text-white text-xs font-bold uppercase tracking-widest text-center hover:from-blue-500 hover:to-blue-400 transition-all shadow-lg shadow-blue-500/20"
                     >
-                      {s.cta || "CONHECER PARCEIRO"}
+                      {s.cta || "CONHECER PARCEIRO"} →
                     </a>
                   ) : (
                     <>
