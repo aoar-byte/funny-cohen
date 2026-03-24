@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS (MESMA LARGURA DOS CARDS + NÃO ULTRAPASSA A TELA)
+// SERVIÇOS (TÍTULOS TRUNCADOS + MESMA ALTURA FORÇADA)
 // ============================================================
 const Services = ({ servicos, links, onLeadOpen }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1224,7 +1224,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     return desc.split("|").map(part => part.trim()).filter(part => part);
   };
 
-  // Define o resumo para cada card (apenas 1 linha de destaque)
+  // Define o resumo para cada card
   const getResumo = (id: string) => {
     const resumos: Record<string, string> = {
       sync: "Licenciamento para Cinema, TV e Games",
@@ -1236,7 +1236,14 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     return resumos[id] || "Sob consulta";
   };
 
-  // Separa os serviços pela coluna "categoria" da planilha
+  // Trunca título longo para 2 linhas no máximo
+  const getTituloAbreviado = (titulo: string) => {
+    if (titulo.length > 30) {
+      return titulo.substring(0, 30) + "...";
+    }
+    return titulo;
+  };
+
   const servicosEmpresas = servicos.filter((s: any) => s.categoria === "empresas");
   const servicosArtistas = servicos.filter((s: any) => s.categoria === "artistas");
 
@@ -1247,7 +1254,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     >
       <div className="max-w-7xl mx-auto px-6">
         
-        {/* TÍTULO PRINCIPAL - MAIS COMPACTO */}
+        {/* TÍTULO PRINCIPAL */}
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center gap-2 text-blue-500 font-mono text-[10px] tracking-widest uppercase mb-1">
             <span className="w-1 h-1 bg-blue-500 rounded-full animate-pulse" />
@@ -1262,7 +1269,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
           </p>
         </div>
 
-        {/* DUAS COLUNAS LADO A LADO - FUNDO UNIFICADO */}
+        {/* DUAS COLUNAS LADO A LADO */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           
           {/* COLUNA ESQUERDA - EMPRESAS */}
@@ -1285,28 +1292,42 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                 {servicosEmpresas.map((s: any, i: number) => {
                   const Icon = s.icon;
                   const resumo = getResumo(s.id);
+                  const tituloAbreviado = getTituloAbreviado(s.title);
                   
                   return (
                     <div
                       key={i}
-                      className="group bg-slate-950/80 border border-blue-500/20 hover:border-blue-500/50 rounded-xl transition-all duration-300 overflow-hidden"
+                      className="group bg-slate-950/80 border border-blue-500/20 hover:border-blue-500/50 rounded-xl transition-all duration-300 overflow-hidden h-full"
                     >
-                      <div className="p-4 text-center">
+                      <div className="p-4 text-center flex flex-col h-full">
+                        {/* Ícone - Fixo */}
                         <div className="flex justify-center mb-3">
                           <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Icon className="w-6 h-6 text-blue-500" />
                           </div>
                         </div>
-                        <h4 className="text-sm font-bold text-white mb-2">
-                          {s.title}
-                        </h4>
-                        <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
-                          {resumo}
-                        </p>
+                        
+                        {/* Título - Altura fixa para 2 linhas */}
+                        <div className="h-10 flex items-center justify-center mb-2">
+                          <h4 className="text-sm font-bold text-white text-center leading-tight line-clamp-2">
+                            {tituloAbreviado}
+                          </h4>
+                        </div>
+                        
+                        {/* Resumo - Altura fixa para 2 linhas */}
+                        <div className="h-10 flex items-center justify-center mb-3">
+                          <p className="text-slate-400 text-[11px] text-center leading-relaxed line-clamp-2">
+                            {resumo}
+                          </p>
+                        </div>
+                        
+                        {/* Preço - Fixo */}
                         <div className="text-[9px] text-emerald-500 font-mono mb-2">
                           *Sob consulta*
                         </div>
-                        <div className="flex gap-2 justify-center">
+                        
+                        {/* Botões - Fixos no final */}
+                        <div className="flex gap-2 justify-center mt-auto">
                           <button
                             onClick={() => openDetails(s)}
                             className="px-3 py-1 border border-blue-500/30 text-blue-400 text-[9px] font-bold uppercase tracking-widest hover:bg-blue-500/10 transition-colors rounded"
@@ -1348,39 +1369,55 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                 {servicosArtistas.map((s: any, i: number) => {
                   const Icon = s.icon;
                   const resumo = getResumo(s.id);
+                  const tituloAbreviado = getTituloAbreviado(s.title);
                   const isDistro = s.id === "distro";
                   const isMarketing = s.id === "marketing";
                   
                   return (
                     <div
                       key={i}
-                      className={`group bg-slate-950/80 border rounded-xl transition-all duration-300 overflow-hidden ${
+                      className={`group bg-slate-950/80 border rounded-xl transition-all duration-300 overflow-hidden h-full ${
                         isDistro || isMarketing
                           ? "border-emerald-500/30 hover:border-emerald-500/50"
                           : "border-emerald-500/20 hover:border-emerald-500/40"
                       }`}
                     >
-                      <div className="p-4 text-center">
+                      <div className="p-4 text-center flex flex-col h-full">
+                        {/* Ícone - Fixo */}
                         <div className="flex justify-center mb-3">
                           <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                             <Icon className="w-6 h-6 text-emerald-500" />
                           </div>
                         </div>
-                        <h4 className={`text-sm font-bold mb-2 ${
-                          isDistro || isMarketing ? "text-emerald-400" : "text-white"
-                        }`}>
-                          {s.title}
-                        </h4>
+                        
+                        {/* Título - Altura fixa para 2 linhas */}
+                        <div className="h-10 flex items-center justify-center mb-1">
+                          <h4 className={`text-sm font-bold text-center leading-tight line-clamp-2 ${
+                            isDistro || isMarketing ? "text-emerald-400" : "text-white"
+                          }`}>
+                            {tituloAbreviado}
+                          </h4>
+                        </div>
+                        
+                        {/* Badge DESTAQUE - Altura fixa */}
                         {(isDistro || isMarketing) && (
-                          <span className="inline-block mb-1 text-[7px] bg-emerald-500/20 text-emerald-400 px-1.5 py-0.5 rounded-full">
-                            DESTAQUE
-                          </span>
+                          <div className="h-5 flex items-center justify-center mb-1">
+                            <span className="text-[7px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full">
+                              DESTAQUE
+                            </span>
+                          </div>
                         )}
-                        <p className="text-slate-400 text-[11px] leading-relaxed mb-3">
-                          {resumo}
-                        </p>
+                        
+                        {/* Resumo - Altura fixa para 2 linhas */}
+                        <div className="h-10 flex items-center justify-center mb-3">
+                          <p className="text-slate-400 text-[11px] text-center leading-relaxed line-clamp-2">
+                            {resumo}
+                          </p>
+                        </div>
+                        
+                        {/* Logo Parceiro - Altura fixa */}
                         {isDistro && (
-                          <div className="mb-2 flex justify-center">
+                          <div className="h-8 flex justify-center items-center mb-1">
                             <img 
                               src="/parceiro-logo.png" 
                               alt="Parceiro"
@@ -1391,10 +1428,14 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                             />
                           </div>
                         )}
+                        
+                        {/* Preço - Fixo */}
                         <div className="text-[9px] text-emerald-500 font-mono mb-2">
                           *Sob consulta*
                         </div>
-                        <div className="flex gap-2 justify-center">
+                        
+                        {/* Botões - Fixos no final */}
+                        <div className="flex gap-2 justify-center mt-auto">
                           <button
                             onClick={() => openDetails(s)}
                             className={`px-3 py-1 text-[9px] font-bold uppercase tracking-widest transition-colors rounded ${
