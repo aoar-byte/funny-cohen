@@ -1208,280 +1208,123 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS (VERSÃO SIMPLIFICADA E CORRIGIDA)
+// SERVIÇOS (VERSÃO SIMPLIFICADA)
 // ============================================================
-const Services = ({ servicos, links, onLeadOpen }: any) => {
+const Services = ({ servicos, links }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedService, setSelectedService] = useState<any>(null);
 
-  const openDetails = (service: any) => {
-    setSelectedService(service);
-    setModalOpen(true);
-  };
-
-  const formatDescription = (desc: string) => {
-    if (!desc) return [];
-    if (Array.isArray(desc)) return desc;
-    if (desc.includes("|")) {
-      return desc.split("|").map(part => part.trim()).filter(part => part);
-    }
-    if (desc.includes("\n")) {
-      return desc.split("\n").map(part => part.trim()).filter(part => part);
-    }
-    return [desc];
-  };
-
-  // Serviços organizados por categoria
-  const b2bServices = servicos.filter((s: any) => s.categoria === "empresas");
-  const artistServices = servicos.filter((s: any) => s.categoria === "artistas");
+  // Separa serviços por categoria
+  const empresas = servicos.filter((s: any) => s.categoria === "empresas");
+  const artistas = servicos.filter((s: any) => s.categoria === "artistas");
 
   return (
     <section id="services" className="py-24 bg-slate-900 border-t border-white/5">
       <div className="max-w-7xl mx-auto px-6">
         
-        {/* CABEÇALHO */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 bg-blue-500/10 px-4 py-2 rounded-full mb-4">
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-            <span className="text-blue-500 font-mono text-[10px] tracking-widest uppercase">SOLUTIONS</span>
-            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-          </div>
-          <h2 className="text-4xl md:text-5xl font-black text-white tracking-tight mb-3">
-            Soluções Integradas
-          </h2>
-          <p className="text-slate-400 text-base max-w-2xl mx-auto">
-            Atendemos tanto o mercado corporativo quanto artistas independentes.
-          </p>
+        {/* TÍTULO */}
+        <div className="text-center mb-12">
+          <div className="text-blue-500 text-sm font-mono mb-2">SOLUTIONS</div>
+          <h2 className="text-4xl font-bold text-white mb-2">Soluções Integradas</h2>
+          <p className="text-slate-400">Atendemos tanto o mercado corporativo quanto artistas independentes.</p>
         </div>
 
-        {/* GRID PRINCIPAL - 2 COLUNAS */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* 2 COLUNAS */}
+        <div className="grid md:grid-cols-2 gap-8">
           
-          {/* COLUNA B2B */}
-          <div className="bg-gradient-to-br from-blue-950/30 to-slate-950 rounded-2xl border border-blue-500/20 overflow-hidden">
-            <div className="p-6 border-b border-blue-500/20 bg-blue-950/20">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <span className="text-blue-500 text-sm font-bold">B2B</span>
-                </div>
-                <span className="text-blue-500 font-mono text-xs tracking-wider">SOLUTIONS</span>
-              </div>
-              <h3 className="text-2xl font-bold text-white">Para Empresas.</h3>
-              <p className="text-slate-400 text-sm mt-1">
-                Licenciamento e identidade sonora para marcas, agências e produtoras.
-              </p>
+          {/* COLUNA ESQUERDA - EMPRESAS */}
+          <div className="bg-slate-800/50 rounded-xl border border-blue-500/20 overflow-hidden">
+            <div className="p-5 border-b border-blue-500/20 bg-blue-500/5">
+              <h3 className="text-blue-400 text-sm font-mono mb-1">B2B SOLUTIONS</h3>
+              <h4 className="text-xl font-bold text-white">Para Empresas.</h4>
+              <p className="text-slate-400 text-sm">Licenciamento e identidade sonora para marcas, agências e produtoras.</p>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {b2bServices.map((service: any, idx: number) => {
-                  const Icon = service.icon;
-                  return (
-                    <div
-                      key={idx}
-                      className="group bg-slate-950/60 border border-blue-500/20 hover:border-blue-500/40 rounded-xl transition-all duration-300"
-                    >
-                      <div className="p-5">
-                        <div className="flex items-start gap-4">
-                          <div className="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
-                            <Icon className="w-6 h-6 text-blue-500" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h4 className="text-white font-bold text-lg mb-1 truncate">
-                              {service.title}
-                            </h4>
-                            <p className="text-slate-400 text-sm mb-3 line-clamp-2">
-                              {service.desc?.split("|")[0] || "Sob consulta"}
-                            </p>
-                            <div className="flex items-center justify-between">
-                              <span className="text-emerald-500 text-xs font-mono bg-emerald-500/10 px-2 py-1 rounded">
-                                Sob consulta
-                              </span>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => openDetails(service)}
-                                  className="text-blue-400 hover:text-blue-300 text-xs font-bold uppercase tracking-wider transition-colors"
-                                >
-                                  DETALHES
-                                </button>
-                                <button
-                                  onClick={() => window.open(links.whatsapp, "_blank")}
-                                  className="text-green-500 hover:text-green-400 transition-colors"
-                                >
-                                  <MessageCircle size={16} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
+            <div className="divide-y divide-white/5">
+              {empresas.map((servico: any, i: number) => (
+                <div key={i} className="p-5 hover:bg-white/5 transition">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h5 className="font-bold text-white mb-1">{servico.title}</h5>
+                      <p className="text-sm text-slate-400">{servico.desc?.split("|")[0]}</p>
+                      <span className="text-xs text-emerald-500 mt-2 inline-block">Sob consulta</span>
                     </div>
-                  );
-                })}
-              </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(servico);
+                        setModalOpen(true);
+                      }}
+                      className="text-xs text-blue-400 hover:text-blue-300"
+                    >
+                      DETALHES
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* COLUNA ARTISTAS */}
-          <div className="bg-gradient-to-br from-emerald-950/30 to-slate-950 rounded-2xl border border-emerald-500/20 overflow-hidden">
-            <div className="p-6 border-b border-emerald-500/20 bg-emerald-950/20">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
-                  <span className="text-emerald-500 text-sm font-bold">🎵</span>
-                </div>
-                <span className="text-emerald-500 font-mono text-xs tracking-wider">ARTIST SOLUTIONS</span>
-              </div>
-              <h3 className="text-2xl font-bold text-white">Para Artistas.</h3>
-              <p className="text-slate-400 text-sm mt-1">
-                Soluções completas para sua carreira musical, do estúdio ao streaming.
-              </p>
+          {/* COLUNA DIREITA - ARTISTAS */}
+          <div className="bg-slate-800/50 rounded-xl border border-emerald-500/20 overflow-hidden">
+            <div className="p-5 border-b border-emerald-500/20 bg-emerald-500/5">
+              <h3 className="text-emerald-400 text-sm font-mono mb-1">ARTIST SOLUTIONS</h3>
+              <h4 className="text-xl font-bold text-white">Para Artistas.</h4>
+              <p className="text-slate-400 text-sm">Soluções completas para sua carreira musical, do estúdio ao streaming.</p>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {artistServices.map((service: any, idx: number) => {
-                  const Icon = service.icon;
-                  const isDistro = service.id === "distro";
-                  
-                  return (
-                    <div
-                      key={idx}
-                      className={`group bg-slate-950/60 border rounded-xl transition-all duration-300 ${
-                        isDistro 
-                          ? "border-emerald-500/30 hover:border-emerald-500/50" 
-                          : "border-emerald-500/20 hover:border-emerald-500/40"
-                      }`}
-                    >
-                      <div className="p-5">
-                        <div className="flex items-start gap-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform ${
-                            isDistro ? "bg-emerald-500/15" : "bg-emerald-500/10"
-                          }`}>
-                            <Icon className={`w-6 h-6 ${
-                              isDistro ? "text-emerald-400" : "text-emerald-500"
-                            }`} />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-bold text-lg truncate ${
-                                isDistro ? "text-emerald-400" : "text-white"
-                              }`}>
-                                {service.title}
-                              </h4>
-                              {isDistro && (
-                                <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">
-                                  DESTAQUE
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-slate-400 text-sm mb-3 line-clamp-2">
-                              {service.desc?.split("|")[0] || "Sob consulta"}
-                            </p>
-                            {isDistro && (
-                              <div className="mb-2">
-                                <span className="text-[9px] text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded">
-                                  🚀 Em parceria
-                                </span>
-                              </div>
-                            )}
-                            <div className="flex items-center justify-between">
-                              <span className="text-emerald-500 text-xs font-mono bg-emerald-500/10 px-2 py-1 rounded">
-                                Sob consulta
-                              </span>
-                              <div className="flex gap-2">
-                                <button
-                                  onClick={() => openDetails(service)}
-                                  className={`text-xs font-bold uppercase tracking-wider transition-colors ${
-                                    isDistro ? "text-emerald-400 hover:text-emerald-300" : "text-emerald-400 hover:text-emerald-300"
-                                  }`}
-                                >
-                                  DETALHES
-                                </button>
-                                <button
-                                  onClick={() => window.open(links.whatsapp, "_blank")}
-                                  className="text-green-500 hover:text-green-400 transition-colors"
-                                >
-                                  <MessageCircle size={16} />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+            <div className="divide-y divide-white/5">
+              {artistas.map((servico: any, i: number) => (
+                <div key={i} className="p-5 hover:bg-white/5 transition">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <h5 className="font-bold text-white">{servico.title}</h5>
+                        {servico.id === "distro" && (
+                          <span className="text-[9px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">DESTAQUE</span>
+                        )}
                       </div>
+                      <p className="text-sm text-slate-400">{servico.desc?.split("|")[0]}</p>
+                      <span className="text-xs text-emerald-500 mt-2 inline-block">Sob consulta</span>
                     </div>
-                  );
-                })}
-              </div>
+                    <button 
+                      onClick={() => {
+                        setSelectedService(servico);
+                        setModalOpen(true);
+                      }}
+                      className="text-xs text-emerald-400 hover:text-emerald-300"
+                    >
+                      DETALHES
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* MODAL DE DETALHES */}
-      <AnimatePresence>
-        {modalOpen && selectedService && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-slate-900 border border-white/10 w-full max-w-md p-6 relative max-h-[80vh] overflow-y-auto rounded-xl"
-            >
-              <button
-                onClick={() => setModalOpen(false)}
-                className="absolute top-3 right-3 text-slate-400 hover:text-white transition-colors"
-              >
-                <X size={18} />
-              </button>
-              
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-600/20 flex items-center justify-center rounded-full">
-                  <selectedService.icon className="w-5 h-5 text-blue-500" />
-                </div>
-                <h3 className="text-lg font-bold text-white">
-                  {selectedService.title}
-                </h3>
-              </div>
-              
-              <div className="mb-4">
-                <h4 className="text-[10px] font-bold text-white mb-2 uppercase tracking-wider border-l-2 border-blue-500 pl-2">
-                  Sobre o serviço
-                </h4>
-                <div className="space-y-2">
-                  {formatDescription(selectedService.desc).map((line, idx) => (
-                    <div key={idx} className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
-                      <p className="text-slate-300 text-xs leading-relaxed">
-                        {line}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {selectedService.external && (
-                <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
-                  <p className="text-emerald-400 text-[8px] font-mono mb-1">🚀 EM PARCERIA COM</p>
-                  <p className="text-white text-xs font-medium">Distribuidora Parceira</p>
-                </div>
-              )}
-
-              <div className="mb-5 p-3 bg-slate-800/50 border border-white/5 rounded-lg">
-                <p className="text-emerald-500 text-[9px] font-mono mb-1">💰 Sob consulta</p>
-                <p className="text-slate-400 text-[10px]">
-                  Entre em contato para receber um orçamento personalizado para sua necessidade.
-                </p>
-              </div>
-
-              <button
+      {/* MODAL SIMPLES */}
+      {modalOpen && selectedService && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setModalOpen(false)}>
+          <div className="bg-slate-900 rounded-xl max-w-md w-full p-6 border border-white/10" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4">
+              <h3 className="text-xl font-bold text-white">{selectedService.title}</h3>
+              <button onClick={() => setModalOpen(false)} className="text-slate-400 hover:text-white">✕</button>
+            </div>
+            <div className="space-y-3 text-slate-300">
+              {selectedService.desc?.split("|").map((item: string, i: number) => (
+                <p key={i}>• {item.trim()}</p>
+              ))}
+            </div>
+            <div className="mt-6 pt-4 border-t border-white/10">
+              <button 
                 onClick={() => window.open(links.whatsapp, "_blank")}
-                className="w-full py-2.5 bg-green-600 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-green-700 transition-colors flex items-center justify-center gap-2 rounded-lg"
+                className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 transition"
               >
-                <MessageCircle size={14} />
                 FALAR NO WHATSAPP
               </button>
-            </motion.div>
+            </div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </section>
   );
 };
