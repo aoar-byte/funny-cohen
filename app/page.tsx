@@ -1208,26 +1208,32 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS - TODOS OS 7 CARDS NA MESMA LINHA HORIZONTAL
+// SERVIÇOS - COM BASE NOS DADOS DA PLANILHA
 // ============================================================
 const Services = ({ servicos, links }: any) => {
   const [selected, setSelected] = useState<any>(null);
 
-  // Mapeamento dos serviços com os dados corretos
-  const servicosCompletos = [
-    { id: "sync", title: "Sync Licensing (Audiovisual)", desc: "Licenciamento para Cinema, TV e Games.", categoria: "empresas", icon: "Globe" },
-    { id: "brand", title: "Jingles & Sonic Branding", desc: "Trilhas originais para campanhas de alcance nacional e tráfego pago.", categoria: "empresas", icon: "Volume2" },
-    { id: "ghost", title: "Ghostwriting", desc: "Produção fantasma para artistas de Tier-1.", categoria: "empresas", icon: "PenTool" },
-    { id: "distro", title: "Distribuição", desc: "Distribuição em todas as plataformas digitais.", categoria: "artistas", icon: "TrendingUp", destaque: true },
-    { id: "incentivi", title: "Editais de incentivo a cultura", desc: "Suporte para leis de incentivo e captação de recursos.", categoria: "artistas", icon: "Award" },
-    { id: "anals", title: "Análise de carreira", desc: "Análise de dados e estratégias para crescimento artístico.", categoria: "artistas", icon: "BarChart3" },
-    { id: "dgt", title: "Digital Marketing", desc: "Estratégias de marketing musical e tráfego pago.", categoria: "artistas", icon: "Zap" }
-  ];
+  // Usando os dados que vieram da planilha
+  const todosServicos = servicos;
 
-  // Função para pegar ícone
+  // Mapeamento de ícones
   const getIcon = (iconName: string) => {
-    const icons: Record<string, any> = { Globe, Volume2, PenTool, TrendingUp, Award, BarChart3, Zap };
+    const icons: Record<string, any> = {
+      Globe, Volume2, PenTool, TrendingUp, Award, BarChart3, Zap
+    };
     return icons[iconName] || PenTool;
+  };
+
+  // Formatar descrição para exibir apenas o primeiro item no card
+  const getPrimeiraDescricao = (desc: string) => {
+    if (!desc) return "Sob consulta";
+    return desc.split("|")[0];
+  };
+
+  // Formatar descrição completa para o modal
+  const getDescricaoCompleta = (desc: string) => {
+    if (!desc) return [];
+    return desc.split("|").map(item => item.trim()).filter(item => item);
   };
 
   return (
@@ -1253,19 +1259,20 @@ const Services = ({ servicos, links }: any) => {
           </div>
         </div>
 
-        {/* TODOS OS 7 CARDS LADO A LADO COM SCROLL */}
+        {/* TODOS OS CARDS LADO A LADO COM SCROLL HORIZONTAL */}
         <div className="overflow-x-auto pb-4">
           <div className="flex gap-6 min-w-max">
-            {servicosCompletos.map((s: any, i: number) => {
+            {todosServicos.map((s: any, i: number) => {
               const isEmpresa = s.categoria === "empresas";
               const Icon = getIcon(s.icon);
+              
               return (
                 <div
                   key={i}
                   className={`w-80 flex-shrink-0 bg-slate-800 rounded-xl p-6 border flex flex-col ${
                     isEmpresa ? "border-blue-500/20 hover:border-blue-500/50" : "border-emerald-500/20 hover:border-emerald-500/50"
                   } transition-all duration-300`}
-                  style={{ height: "420px" }}
+                  style={{ height: "460px" }}
                 >
                   {/* Ícone */}
                   <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-5 ${
@@ -1275,15 +1282,17 @@ const Services = ({ servicos, links }: any) => {
                   </div>
                   
                   {/* Título */}
-                  <h4 className="text-white font-bold text-lg mb-2">{s.title}</h4>
+                  <h4 className="text-white font-bold text-lg mb-2 leading-tight min-h-[56px]">
+                    {s.title}
+                  </h4>
                   
-                  {/* Descrição */}
+                  {/* Descrição resumida */}
                   <p className="text-slate-400 text-sm mb-4 flex-1">
-                    {s.desc}
+                    {getPrimeiraDescricao(s.desc)}
                   </p>
                   
                   {/* Badge Destaque */}
-                  {s.destaque && (
+                  {s.highlight === true || s.highlight === "TRUE" && (
                     <div className="mb-3">
                       <span className="bg-emerald-500/20 text-emerald-400 text-[10px] px-2 py-1 rounded-full font-bold">
                         DESTAQUE
@@ -1300,7 +1309,7 @@ const Services = ({ servicos, links }: any) => {
                         isEmpresa ? "text-blue-400" : "text-emerald-400"
                       }`}
                     >
-                      Detalhes →
+                      {s.cta || "Detalhes"} →
                     </button>
                   </div>
                 </div>
@@ -1310,21 +1319,43 @@ const Services = ({ servicos, links }: any) => {
         </div>
       </div>
 
-      {/* MODAL */}
+      {/* MODAL COM DESCRIÇÃO COMPLETA */}
       {selected && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setSelected(null)}>
-          <div className="bg-slate-900 rounded-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-slate-900 rounded-xl max-w-md w-full p-6 max-h-[80vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-xl font-bold text-white">{selected.title}</h3>
               <button onClick={() => setSelected(null)} className="text-slate-400 text-2xl">×</button>
             </div>
-            <div className="space-y-2">
-              <p className="text-slate-300">• {selected.desc}</p>
+            
+            <div className="space-y-3">
+              {getDescricaoCompleta(selected.desc).map((item: string, i: number) => (
+                <div key={i} className="flex gap-2">
+                  <span className="text-emerald-500 mt-0.5">•</span>
+                  <p className="text-slate-300 text-sm">{item}</p>
+                </div>
+              ))}
             </div>
+
+            {selected.external && selected.external !== "" && (
+              <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
+                <p className="text-emerald-400 text-xs font-mono mb-1">🚀 EM PARCERIA COM</p>
+                <a 
+                  href={selected.external} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-white text-sm hover:text-emerald-400 transition flex items-center gap-1"
+                >
+                  HitUp Brasil <ExternalLink size={12} />
+                </a>
+              </div>
+            )}
+            
             <button 
               onClick={() => window.open(links.whatsapp, "_blank")}
-              className="w-full mt-6 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
+              className="w-full mt-6 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center gap-2"
             >
+              <MessageCircle size={18} />
               Falar no WhatsApp
             </button>
           </div>
