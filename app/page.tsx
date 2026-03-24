@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS - TODOS OS CARDS NA MESMA LINHA HORIZONTAL
+// SERVIÇOS - FUNDOS AZUL E VERDE NOS CABEÇALHOS
 // ============================================================
 const Services = ({ servicos, links }: any) => {
   const [selected, setSelected] = useState<any>(null);
@@ -1216,7 +1216,6 @@ const Services = ({ servicos, links }: any) => {
   const empresas = servicos.filter((s: any) => s.categoria === "empresas");
   const artistas = servicos.filter((s: any) => s.categoria === "artistas");
   
-  // TODOS OS SERVIÇOS JUNTOS EM UM ÚNICO ARRAY
   const todosServicos = [...empresas, ...artistas];
 
   return (
@@ -1230,19 +1229,19 @@ const Services = ({ servicos, links }: any) => {
           <p className="text-slate-400 mt-2">Atendemos mercado corporativo e artistas independentes</p>
         </div>
 
-        {/* CABEÇALHOS DAS CATEGORIAS */}
+        {/* CABEÇALHOS COM FUNDOS AZUL E VERDE */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-          <div className="text-left">
+          <div className="bg-gradient-to-r from-blue-950/40 to-blue-950/20 rounded-xl p-5 border border-blue-500/20">
             <h3 className="text-blue-500 text-xl font-bold">B2B SOLUTIONS</h3>
-            <p className="text-slate-400 text-sm">Para Empresas. Licenciamento e identidade sonora.</p>
+            <p className="text-slate-400 text-sm mt-1">Para Empresas. Licenciamento e identidade sonora para marcas, agências e produtoras.</p>
           </div>
-          <div className="text-left">
+          <div className="bg-gradient-to-r from-emerald-950/40 to-emerald-950/20 rounded-xl p-5 border border-emerald-500/20">
             <h3 className="text-emerald-500 text-xl font-bold">ARTIST SOLUTIONS</h3>
-            <p className="text-slate-400 text-sm">Para Artistas. Soluções para sua carreira musical.</p>
+            <p className="text-slate-400 text-sm mt-1">Para Artistas. Soluções completas para sua carreira musical, do estúdio ao streaming.</p>
           </div>
         </div>
 
-        {/* TODOS OS CARDS LADO A LADO NA MESMA LINHA */}
+        {/* TODOS OS CARDS LADO A LADO */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {todosServicos.map((s: any, i: number) => {
             const isEmpresa = s.categoria === "empresas";
@@ -1261,7 +1260,7 @@ const Services = ({ servicos, links }: any) => {
                 </div>
                 
                 {/* Título */}
-                <h4 className="text-white font-bold text-xl mb-2">{s.title}</h4>
+                <h4 className="text-white font-bold text-lg mb-2">{s.title}</h4>
                 
                 {/* Descrição */}
                 <p className="text-slate-400 text-sm mb-4 flex-1">
@@ -1277,7 +1276,7 @@ const Services = ({ servicos, links }: any) => {
                   </div>
                 )}
                 
-                {/* Preço e Botão - SEMPRE NA BASE */}
+                {/* Preço e Botão */}
                 <div className="flex items-center justify-between pt-4 border-t border-white/10 mt-auto">
                   <span className="text-emerald-500 text-sm font-medium">Sob consulta</span>
                   <button 
