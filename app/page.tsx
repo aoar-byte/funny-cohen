@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS - CARDS LADO A LADO COM CABEÇALHOS
+// SERVIÇOS - CARDS VERTICAIS COM CABEÇALHO
 // ============================================================
 const Services = ({ servicos, links }: any) => {
   const [selected, setSelected] = useState<any>(null);
@@ -1222,22 +1222,26 @@ const Services = ({ servicos, links }: any) => {
         
         {/* TÍTULO GERAL */}
         <div className="text-center mb-12">
+          <div className="text-blue-500 text-sm font-mono mb-2">SOLUTIONS</div>
           <h2 className="text-4xl font-bold text-white">Soluções Integradas</h2>
           <p className="text-slate-400 mt-2">Atendemos mercado corporativo e artistas independentes</p>
         </div>
 
-        {/* CARDS LADO A LADO COM CABEÇALHOS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* 2 COLUNAS */}
+        <div className="grid md:grid-cols-2 gap-8">
           
           {/* COLUNA EMPRESAS */}
           <div>
-            <div className="mb-6">
-              <h3 className="text-blue-500 text-2xl font-bold">B2B SOLUTIONS</h3>
+            {/* CABEÇALHO */}
+            <div className="mb-6 pb-4 border-b border-blue-500/30">
+              <h3 className="text-blue-500 text-xl font-bold">B2B SOLUTIONS</h3>
               <p className="text-slate-400 text-sm mt-1">Para Empresas. Licenciamento e identidade sonora para marcas, agências e produtoras.</p>
             </div>
+            
+            {/* CARDS */}
             <div className="space-y-4">
               {empresas.map((s, i) => (
-                <div key={i} className="bg-slate-800 rounded-xl p-5 border border-blue-500/20 hover:border-blue-500/50 transition">
+                <div key={i} className="bg-slate-800 rounded-lg p-5 hover:bg-slate-800/80 transition border border-white/5 hover:border-blue-500/30">
                   <h4 className="text-white font-bold text-lg mb-2">{s.title}</h4>
                   <p className="text-slate-400 text-sm mb-3">{s.desc?.split("|")[0]}</p>
                   <div className="flex justify-between items-center">
@@ -1253,13 +1257,16 @@ const Services = ({ servicos, links }: any) => {
 
           {/* COLUNA ARTISTAS */}
           <div>
-            <div className="mb-6">
-              <h3 className="text-emerald-500 text-2xl font-bold">ARTIST SOLUTIONS</h3>
+            {/* CABEÇALHO */}
+            <div className="mb-6 pb-4 border-b border-emerald-500/30">
+              <h3 className="text-emerald-500 text-xl font-bold">ARTIST SOLUTIONS</h3>
               <p className="text-slate-400 text-sm mt-1">Para Artistas. Soluções completas para sua carreira musical, do estúdio ao streaming.</p>
             </div>
+            
+            {/* CARDS */}
             <div className="space-y-4">
               {artistas.map((s, i) => (
-                <div key={i} className="bg-slate-800 rounded-xl p-5 border border-emerald-500/20 hover:border-emerald-500/50 transition">
+                <div key={i} className="bg-slate-800 rounded-lg p-5 hover:bg-slate-800/80 transition border border-white/5 hover:border-emerald-500/30">
                   <div className="flex items-center gap-2 mb-2">
                     <h4 className="text-white font-bold text-lg">{s.title}</h4>
                     {s.id === "distro" && (
