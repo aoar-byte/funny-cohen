@@ -1224,16 +1224,16 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     return desc.split("|").map(part => part.trim()).filter(part => part);
   };
 
-  // Define o resumo para cada card (texto curto e consistente)
-  const getResumo = (id: string) => {
-    const resumos: Record<string, string> = {
-      sync: "Licenciamento para Cinema, TV e Games",
-      brand: "Trilhas originais para campanhas de alcance nacional",
-      ghost: "Produção fantasma para artistas de Tier-1",
-      distro: "Distribuição em todas as plataformas digitais",
-      marketing: "Estratégias de marketing musical e análise de carreira",
-    };
-    return resumos[id] || "Sob consulta";
+  // Define o resumo para cada card baseado nos dados da planilha
+  const getResumo = (service: any) => {
+    if (service.desc) {
+      const primeiraLinha = service.desc.split("|")[0];
+      if (primeiraLinha && primeiraLinha.length > 60) {
+        return primeiraLinha.substring(0, 57) + "...";
+      }
+      return primeiraLinha || "Sob consulta";
+    }
+    return "Sob consulta";
   };
 
   // Trunca título longo para 2 linhas no máximo
@@ -1291,7 +1291,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {servicosEmpresas.map((s: any, i: number) => {
                   const Icon = s.icon;
-                  const resumo = getResumo(s.id);
+                  const resumo = getResumo(s);
                   const tituloAbreviado = getTituloAbreviado(s.title);
                   
                   return (
@@ -1334,7 +1334,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                             onClick={() => openDetails(s)}
                             className="px-4 py-2 border border-blue-500/30 text-blue-400 text-[10px] font-bold uppercase tracking-widest hover:bg-blue-500/10 hover:text-blue-300 transition-colors rounded-lg"
                           >
-                            DETALHES
+                            {s.cta || "DETALHES"}
                           </button>
                           <button
                             onClick={() => window.open(links.whatsapp, "_blank")}
@@ -1370,16 +1370,15 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 {servicosArtistas.map((s: any, i: number) => {
                   const Icon = s.icon;
-                  const resumo = getResumo(s.id);
+                  const resumo = getResumo(s);
                   const tituloAbreviado = getTituloAbreviado(s.title);
-                  const isDistro = s.id === "distro";
-                  const isMarketing = s.id === "marketing";
+                  const isDestaque = s.highlight === true || s.highlight === "TRUE";
                   
                   return (
                     <div
                       key={i}
                       className={`group bg-slate-950/80 border rounded-xl transition-all duration-300 overflow-hidden flex flex-col h-full ${
-                        isDistro || isMarketing
+                        isDestaque
                           ? "border-emerald-500/30 hover:border-emerald-500/50"
                           : "border-emerald-500/20 hover:border-emerald-500/40"
                       }`}
@@ -1388,10 +1387,10 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                         {/* Ícone */}
                         <div className="flex justify-center mb-4">
                           <div className={`w-14 h-14 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform ${
-                            isDistro || isMarketing ? "bg-emerald-500/15" : "bg-emerald-500/10"
+                            isDestaque ? "bg-emerald-500/15" : "bg-emerald-500/10"
                           }`}>
                             <Icon className={`w-7 h-7 ${
-                              isDistro || isMarketing ? "text-emerald-400" : "text-emerald-500"
+                              isDestaque ? "text-emerald-400" : "text-emerald-500"
                             }`} />
                           </div>
                         </div>
@@ -1399,14 +1398,14 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                         {/* Título - Altura fixa para 2 linhas */}
                         <div className="min-h-[56px] flex items-center justify-center mb-2">
                           <h4 className={`text-base font-bold text-center leading-tight line-clamp-2 ${
-                            isDistro || isMarketing ? "text-emerald-400" : "text-white"
+                            isDestaque ? "text-emerald-400" : "text-white"
                           }`}>
                             {tituloAbreviado}
                           </h4>
                         </div>
                         
                         {/* Badge DESTAQUE */}
-                        {(isDistro || isMarketing) && (
+                        {isDestaque && (
                           <div className="flex justify-center mb-3">
                             <span className="text-[8px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-bold">
                               DESTAQUE
@@ -1422,7 +1421,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                         </div>
                         
                         {/* Logo Parceiro */}
-                        {isDistro && (
+                        {s.external && s.external !== "" && (
                           <div className="flex justify-center items-center mb-4 min-h-[32px]">
                             <div className="w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center">
                               <span className="text-[8px] text-emerald-400 font-mono">PARCEIRO</span>
@@ -1442,12 +1441,12 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                           <button
                             onClick={() => openDetails(s)}
                             className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors rounded-lg ${
-                              isDistro || isMarketing
+                              isDestaque
                                 ? "border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
                                 : "border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
                             }`}
                           >
-                            DETALHES
+                            {s.cta || "DETALHES"}
                           </button>
                           <button
                             onClick={() => window.open(links.whatsapp, "_blank")}
@@ -1505,10 +1504,17 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                 </div>
               </div>
 
-              {selectedService.external && (
+              {selectedService.external && selectedService.external !== "" && (
                 <div className="mb-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-lg">
                   <p className="text-emerald-400 text-[8px] font-mono mb-1">🚀 EM PARCERIA COM</p>
-                  <p className="text-white text-xs font-medium">Distribuidora Parceira</p>
+                  <a 
+                    href={selectedService.external}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white text-xs font-medium hover:text-emerald-400 transition flex items-center gap-1"
+                  >
+                    HitUp Brasil <ExternalLink size={10} />
+                  </a>
                 </div>
               )}
 
