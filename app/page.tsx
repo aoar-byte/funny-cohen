@@ -1208,7 +1208,7 @@ const PersistentPlayer = ({
 };
 
 // ============================================================
-// SERVIÇOS (COM ALTURA CONSISTENTE E LAYOUT ALINHADO)
+// SERVIÇOS (COM QUANTIDADE IGUAL DE CARDS POR COLUNA)
 // ============================================================
 const Services = ({ servicos, links, onLeadOpen }: any) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -1219,33 +1219,69 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
     setModalOpen(true);
   };
 
+  // FUNÇÃO MELHORADA PARA FORMATAR DESCRIÇÃO
   const formatDescription = (desc: string) => {
     if (!desc) return [];
-    return desc.split("|").map(part => part.trim()).filter(part => part);
+    if (Array.isArray(desc)) return desc;
+    if (desc.includes("|")) {
+      return desc.split("|").map(part => part.trim()).filter(part => part);
+    }
+    if (desc.includes("\n")) {
+      return desc.split("\n").map(part => part.trim()).filter(part => part);
+    }
+    if (desc.includes(";")) {
+      return desc.split(";").map(part => part.trim()).filter(part => part);
+    }
+    return [desc];
   };
 
-  // Define o resumo para cada card (texto curto e consistente)
-  const getResumo = (id: string) => {
+  // Define o resumo para cada card
+  const getResumo = (id: string, desc?: string) => {
     const resumos: Record<string, string> = {
       sync: "Licenciamento para Cinema, TV e Games",
       brand: "Trilhas originais para campanhas de alcance nacional",
       ghost: "Produção fantasma para artistas de Tier-1",
-      distro: "Distribuição em todas as plataformas digitais",
-      marketing: "Estratégias de marketing musical e análise de carreira",
+      distro: "Distribuição digital, marketing e editais",
+      marketing: "Estratégias de marketing e análise de carreira",
     };
+    
+    if (id === "distro" && desc) {
+      const items = formatDescription(desc);
+      if (items.length > 0) {
+        return items.slice(0, 2).join(" • ");
+      }
+    }
+    
     return resumos[id] || "Sob consulta";
   };
 
-  // Trunca título longo para 2 linhas no máximo
+  // Trunca título longo
   const getTituloAbreviado = (titulo: string) => {
-    if (titulo.length > 30) {
-      return titulo.substring(0, 30) + "...";
+    if (titulo.length > 28) {
+      return titulo.substring(0, 28) + "...";
     }
     return titulo;
   };
 
+  // FILTROS CORRETOS
   const servicosEmpresas = servicos.filter((s: any) => s.categoria === "empresas");
   const servicosArtistas = servicos.filter((s: any) => s.categoria === "artistas");
+
+  // GARANTE QUE AMBAS AS COLUNAS TENHAM O MESMO NÚMERO DE CARDS
+  // Encontra o número máximo de cards entre as duas colunas
+  const maxCards = Math.max(servicosEmpresas.length, servicosArtistas.length);
+  
+  // Completa a coluna com cards vazios (placeholders) se necessário
+  const padArray = (arr: any[], length: number) => {
+    const padded = [...arr];
+    while (padded.length < length) {
+      padded.push(null); // Card vazio/placeholder
+    }
+    return padded;
+  };
+
+  const empresasPadded = padArray(servicosEmpresas, maxCards);
+  const artistasPadded = padArray(servicosArtistas, maxCards);
 
   return (
     <section
@@ -1269,11 +1305,11 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
           </p>
         </div>
 
-        {/* DUAS COLUNAS LADO A LADO COM ALTURA IGUAL */}
+        {/* DUAS COLUNAS COM ALTURA IGUAL E MESMA QUANTIDADE DE CARDS */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
           {/* COLUNA ESQUERDA - EMPRESAS */}
-          <div className="bg-gradient-to-br from-blue-950/40 to-slate-950 rounded-2xl border border-blue-500/20 overflow-hidden h-full">
+          <div className="bg-gradient-to-br from-blue-950/40 to-slate-950 rounded-2xl border border-blue-500/20 overflow-hidden h-full flex flex-col">
             <div className="p-6 pb-3 border-b border-blue-500/20">
               <div className="flex items-center gap-2 text-blue-500 font-mono text-[11px] tracking-widest uppercase mb-1">
                 <span className="w-1.5 h-1.5 bg-blue-500 rounded-full" />
@@ -1287,11 +1323,24 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
               </p>
             </div>
 
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {servicosEmpresas.map((s: any, i: number) => {
+            <div className="p-6 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 h-full">
+                {empresasPadded.map((s: any, i: number) => {
+                  // Se for placeholder (card vazio), renderiza um elemento invisível que mantém a estrutura
+                  if (!s) {
+                    return (
+                      <div
+                        key={`empty-${i}`}
+                        className="opacity-0 pointer-events-none"
+                        style={{ visibility: 'hidden' }}
+                      >
+                        <div className="p-5 h-full" />
+                      </div>
+                    );
+                  }
+                  
                   const Icon = s.icon;
-                  const resumo = getResumo(s.id);
+                  const resumo = getResumo(s.id, s.desc);
                   const tituloAbreviado = getTituloAbreviado(s.title);
                   
                   return (
@@ -1307,16 +1356,16 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                           </div>
                         </div>
                         
-                        {/* Título - Altura fixa para 2 linhas */}
+                        {/* Título */}
                         <div className="min-h-[56px] flex items-center justify-center mb-3">
                           <h4 className="text-base font-bold text-white text-center leading-tight line-clamp-2">
                             {tituloAbreviado}
                           </h4>
                         </div>
                         
-                        {/* Resumo - Altura fixa para 2 linhas */}
-                        <div className="min-h-[48px] flex items-center justify-center mb-4">
-                          <p className="text-slate-400 text-xs text-center leading-relaxed line-clamp-2">
+                        {/* Resumo */}
+                        <div className="min-h-[60px] flex items-center justify-center mb-4">
+                          <p className="text-slate-400 text-xs text-center leading-relaxed line-clamp-3">
                             {resumo}
                           </p>
                         </div>
@@ -1328,7 +1377,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                           </span>
                         </div>
                         
-                        {/* Botões - Fixos no final */}
+                        {/* Botões */}
                         <div className="flex gap-2 justify-center mt-auto pt-2">
                           <button
                             onClick={() => openDetails(s)}
@@ -1352,7 +1401,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
           </div>
 
           {/* COLUNA DIREITA - ARTISTAS */}
-          <div className="bg-gradient-to-br from-emerald-950/40 to-slate-950 rounded-2xl border border-emerald-500/20 overflow-hidden h-full">
+          <div className="bg-gradient-to-br from-emerald-950/40 to-slate-950 rounded-2xl border border-emerald-500/20 overflow-hidden h-full flex flex-col">
             <div className="p-6 pb-3 border-b border-emerald-500/20">
               <div className="flex items-center gap-2 text-emerald-500 font-mono text-[11px] tracking-widest uppercase mb-1">
                 <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
@@ -1366,11 +1415,24 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
               </p>
             </div>
 
-            <div className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {servicosArtistas.map((s: any, i: number) => {
+            <div className="p-6 flex-1">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 h-full">
+                {artistasPadded.map((s: any, i: number) => {
+                  // Se for placeholder (card vazio), renderiza um elemento invisível que mantém a estrutura
+                  if (!s) {
+                    return (
+                      <div
+                        key={`empty-${i}`}
+                        className="opacity-0 pointer-events-none"
+                        style={{ visibility: 'hidden' }}
+                      >
+                        <div className="p-5 h-full" />
+                      </div>
+                    );
+                  }
+                  
                   const Icon = s.icon;
-                  const resumo = getResumo(s.id);
+                  const resumo = getResumo(s.id, s.desc);
                   const tituloAbreviado = getTituloAbreviado(s.title);
                   const isDistro = s.id === "distro";
                   const isMarketing = s.id === "marketing";
@@ -1396,7 +1458,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                           </div>
                         </div>
                         
-                        {/* Título - Altura fixa para 2 linhas */}
+                        {/* Título */}
                         <div className="min-h-[56px] flex items-center justify-center mb-2">
                           <h4 className={`text-base font-bold text-center leading-tight line-clamp-2 ${
                             isDistro || isMarketing ? "text-emerald-400" : "text-white"
@@ -1414,9 +1476,9 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                           </div>
                         )}
                         
-                        {/* Resumo - Altura fixa para 2 linhas */}
-                        <div className="min-h-[48px] flex items-center justify-center mb-4">
-                          <p className="text-slate-400 text-xs text-center leading-relaxed line-clamp-2">
+                        {/* Resumo */}
+                        <div className="min-h-[60px] flex items-center justify-center mb-4">
+                          <p className="text-slate-400 text-xs text-center leading-relaxed line-clamp-3">
                             {resumo}
                           </p>
                         </div>
@@ -1437,7 +1499,7 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                           </span>
                         </div>
                         
-                        {/* Botões - Fixos no final */}
+                        {/* Botões */}
                         <div className="flex gap-2 justify-center mt-auto pt-2">
                           <button
                             onClick={() => openDetails(s)}
@@ -1498,9 +1560,12 @@ const Services = ({ servicos, links, onLeadOpen }: any) => {
                 </h4>
                 <div className="space-y-2">
                   {formatDescription(selectedService.desc).map((line, idx) => (
-                    <p key={idx} className="text-slate-300 text-xs leading-relaxed">
-                      {line}
-                    </p>
+                    <div key={idx} className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full mt-1.5 flex-shrink-0" />
+                      <p className="text-slate-300 text-xs leading-relaxed">
+                        {line}
+                      </p>
+                    </div>
                   ))}
                 </div>
               </div>
