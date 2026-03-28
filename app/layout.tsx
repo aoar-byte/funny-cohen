@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "L✦A HIT - Catálogo de Músicas",
+  title: "L✦A HIT",
   description: "Plataforma de licenciamento musical e descoberta de hits. Transformando ideias em ativos musicais.",
   icons: {
     icon: "/favicon-16x16.png",  // ← Aqui está a mudança principal
