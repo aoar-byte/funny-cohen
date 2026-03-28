@@ -663,7 +663,7 @@ const Footer = () => {
 };
 
 // ============================================================
-// NAVBAR COM LOGO CORRETA E TAMANHO AJUSTADO
+// NAVBAR COM SUA LOGO IMAGEM
 // ============================================================
 const Navbar = ({ links }: { links: any }) => {
   const [scrolled, setScrolled] = useState(false);
@@ -687,19 +687,16 @@ const Navbar = ({ links }: { links: any }) => {
       }`}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        {/* LOGO - VERSÃO CORRETA COM TAMANHO AJUSTADO */}
+        {/* LOGO COM IMAGEM */}
         <div
-          className="flex items-center cursor-pointer group"
+          className="flex items-center cursor-pointer"
           onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
         >
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl md:text-2xl font-black tracking-tighter text-white">
-              L<span className="text-blue-500">'</span>A
-            </span>
-            <span className="text-lg md:text-xl font-black text-blue-500">
-              HIT
-            </span>
-          </div>
+          <img 
+            src="/image_2ee558fe-removebg-preview.png"
+            alt="L'A HIT"
+            className="h-8 w-auto md:h-10 transition-all duration-300 hover:opacity-80"
+          />
         </div>
         
         {/* MENU */}
