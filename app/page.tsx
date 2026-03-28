@@ -656,6 +656,76 @@ const Footer = () => {
 };
 
 // ============================================================
+// NAVBAR
+// ============================================================
+const Navbar = ({ links }: { links: any }) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <nav
+      className={`fixed top-0 w-full z-50 transition-all duration-500 border-b ${
+        scrolled
+          ? "bg-slate-950/80 backdrop-blur-md border-white/5 py-4"
+          : "bg-transparent border-transparent py-6"
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
+        <div
+          className="flex items-center gap-3 cursor-pointer group"
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        >
+          {/* LOGO COMO IMAGEM */}
+          <img 
+            src="/logo.png" 
+            alt="L'A HIT" 
+            className="w-10 h-10 object-contain"
+          />
+          <div className="flex flex-col leading-none">
+            <span className="text-lg font-black tracking-tighter text-white">
+              L'A
+            </span>
+            <span className="text-[10px] font-bold tracking-[0.4em] text-blue-500 uppercase">
+              HIT
+            </span>
+          </div>
+        </div>
+        <div className="hidden md:flex items-center gap-8 text-xs font-bold tracking-widest text-slate-400 uppercase">
+          <button
+            onClick={() => scrollToSection("catalog")}
+            className="hover:text-white"
+          >
+            Catálogo
+          </button>
+          <button
+            onClick={() => scrollToSection("services")}
+            className="hover:text-white"
+          >
+            Serviços
+          </button>
+          <button
+            onClick={() => scrollToSection("cases")}
+            className="hover:text-white"
+          >
+            Cases
+          </button>
+        </div>
+        <div className="w-24" />
+      </div>
+    </nav>
+  );
+};
+
+// ============================================================
 // HERO BACKGROUND
 // ============================================================
 const DynamicTerrainCanvas = () => {
