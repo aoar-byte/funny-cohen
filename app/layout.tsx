@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "L'A HIT - Catálogo de Músicas",
-  description: "Plataforma de licenciamento musical e descoberta de hits. Transformando ideias em ativos musicais.",
+  description: "Plataforma de licenciamento musical e descoberta de hits.",
   icons: {
     icon: "/web-app-manifest-512x512.png",
   },
@@ -28,8 +28,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <head>
-        <link rel="icon" href="/web-app-manifest-512x512.png" />
-        <meta name="theme-color" content="#020617" />
+        <link rel="icon" type="image/png" href="/web-app-manifest-512x512.png" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
