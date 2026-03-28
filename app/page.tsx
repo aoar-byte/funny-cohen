@@ -584,7 +584,7 @@ const LeadModal = ({
 };
 
 // ============================================================
-// RODAPÉ COM LOGO ESTILIZADA
+// RODAPÉ COM LOGO ESTILIZADA (CORRIGIDO)
 // ============================================================
 const Footer = () => {
   const scrollToSection = (id: string) =>
@@ -601,6 +601,10 @@ const Footer = () => {
                 src="/image_2ee558fe-removebg-preview.png"
                 alt="L'A HIT"
                 className="h-12 w-auto md:h-16 transition-all duration-300 hover:opacity-80"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = "/fallback-logo.png";
+                }}
               />
               <div className="w-12 h-px bg-gradient-to-r from-blue-500 to-transparent mt-3" />
             </div>
@@ -638,6 +642,31 @@ const Footer = () => {
                   >
                     Cases
                   </button>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h5 className="text-white font-bold uppercase tracking-widest mb-6 text-xs">
+                Contato
+              </h5>
+              <ul className="space-y-3">
+                <li>
+                  <a 
+                    href="mailto:contato@lahit.com" 
+                    className="hover:text-blue-500 transition-colors text-xs"
+                  >
+                    contato@lahit.com
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="https://wa.me/5511999999999" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-blue-500 transition-colors text-xs"
+                  >
+                    WhatsApp
+                  </a>
                 </li>
               </ul>
             </div>
